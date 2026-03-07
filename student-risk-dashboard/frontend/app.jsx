@@ -6,7 +6,6 @@ function App() {
   const [currentPage, setCurrentPage] = useState("login"); // login, dashboard, student
   const [selectedStudentId, setSelectedStudentId] = useState(null);
 
-  // Initialize feather icons on mount and update
   useEffect(() => {
     if (window.feather) {
       window.feather.replace();
@@ -20,20 +19,39 @@ function App() {
   return (
     <div className="app-container">
       <header className="header-nav">
-        <div className="brand">
-          <i data-feather="shield"></i> Student Risk Dashboard
+        <div className="brand" onClick={() => setCurrentPage('dashboard')} style={{ cursor: 'pointer' }}>
+          <div className="brand-icon"><i data-feather="terminal"></i></div>
+          <span>Student Analytics</span>
         </div>
-        <div>
-          <button className="btn btn-outline" style={{ marginRight: 8 }} onClick={() => setCurrentPage('dashboard')}>
-            <i data-feather="grid"></i> Dashboard
+
+        <div className="nav-search">
+          <i data-feather="search" width="16"></i>
+          <input 
+            type="text" 
+            placeholder="Search student identity..." 
+            onFocus={() => setCurrentPage('dashboard')}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button 
+            className={`btn ${currentPage === 'dashboard' ? 'btn-primary' : 'btn-outline'}`} 
+            onClick={() => setCurrentPage('dashboard')}
+            style={{ padding: '10px 16px' }}
+          >
+            <i data-feather="grid" width="18"></i> Dashboard
           </button>
-          <button className="btn btn-outline" onClick={() => setCurrentPage('login')}>
-            <i data-feather="log-out"></i> Logout
+          <button 
+            className="btn btn-outline" 
+            onClick={() => setCurrentPage('login')} 
+            style={{ padding: '10px 16px', background: 'rgba(244, 63, 94, 0.05)', color: '#fb7185', borderColor: 'rgba(244, 63, 94, 0.1)' }}
+          >
+            <i data-feather="power" width="18"></i>
           </button>
         </div>
       </header>
 
-      <main className="view-container animate-fade-in">
+      <main className="view-container animate-fade-in" style={{ paddingTop: '40px' }}>
         {currentPage === "dashboard" && (
           <Dashboard onSelectStudent={(id) => {
             setSelectedStudentId(id);
@@ -52,21 +70,27 @@ function App() {
 function Login({ onLogin }) {
   return (
     <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="glass-panel animate-fade-in" style={{ padding: '48px', maxWidth: '420px', width: '100%', textAlign: 'center', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', background: 'var(--surface-solid)', padding: '16px', borderRadius: '50%', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', color: 'var(--primary)' }}>
-          <i data-feather="shield" width="32" height="32"></i>
+      <div className="glass-panel login-card animate-fade-in" style={{ textAlign: 'center' }}>
+        <div className="brand-icon" style={{ margin: '0 auto 32px', width: 'fit-content', padding: '16px' }}>
+          <i data-feather="zap" width="40" height="40"></i>
         </div>
-        <h2 style={{ marginBottom: 8, marginTop: 24, fontSize: '1.75rem' }}>Student Risk Dashboard</h2>
-        <p style={{ color: 'var(--text-muted)', marginBottom: 32, fontSize: '0.9rem' }}>AI Early Warning System</p>
-        <div className="input-group">
-          <input type="text" className="input-field" placeholder="Email (admin@school.edu)" defaultValue="admin@school.edu" />
+        <h2>Risk Dashboard</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 48, fontSize: '1.1rem' }}>Enter credentials to access the AI analysis engine.</p>
+        
+        <div className="input-group" style={{ marginBottom: 24 }}>
+          <input type="text" className="input-field" placeholder="Email Address" defaultValue="admin@school.edu" style={{ width: '100%' }} />
         </div>
-        <div className="input-group">
-          <input type="password" className="input-field" placeholder="Password" defaultValue="password" />
+        <div className="input-group" style={{ marginBottom: 32 }}>
+          <input type="password" className="input-field" placeholder="Dashboard Passport" defaultValue="password" style={{ width: '100%' }} />
         </div>
-        <button className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '1rem', marginTop: 24, borderRadius: '12px' }} onClick={onLogin}>
-          Sign In
+        
+        <button className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem', borderRadius: '16px' }} onClick={onLogin}>
+          Authenticate Session
         </button>
+        
+        <p style={{ marginTop: 32, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          Powered by Predictive ML Pipeline v2.4
+        </p>
       </div>
     </div>
   );
@@ -77,8 +101,6 @@ function Dashboard({ onSelectStudent }) {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
-  
-  // Filters
   const [riskFilter, setRiskFilter] = useState("All");
   const [classFilter, setClassFilter] = useState("All");
 
@@ -89,122 +111,93 @@ function Dashboard({ onSelectStudent }) {
       const res = await fetch(url);
       const data = await res.json();
       setStudents(data);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchStudents();
-  }, [riskFilter, classFilter]);
+  useEffect(() => { fetchStudents(); }, [riskFilter, classFilter]);
+  useEffect(() => { if (window.feather) window.feather.replace(); });
 
-  useEffect(() => {
-    if (window.feather) window.feather.replace();
-  });
-
-  const uploadSuccess = () => {
-    setShowUpload(false);
-    fetchStudents();
-  };
-
-  // Stats
   const highRiskCount = students.filter(s => s.risk_level === 'High').length;
   const mediumRiskCount = students.filter(s => s.risk_level === 'Medium').length;
   const lowRiskCount = students.filter(s => s.risk_level === 'Low').length;
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 48 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 60 }}>
         <div>
-          <h1 style={{ fontSize: '2.25rem', marginBottom: 8 }}>Overview</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Monitor student performance and early risk indicators.</p>
+          <h1 style={{ fontSize: '3rem', marginBottom: 12 }}>System Overview</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', maxWidth: '600px' }}>Real-time analysis student stability and potential churn indicators powered by current semester data.</p>
         </div>
-        <button className="btn btn-primary" style={{ padding: '14px 28px', fontSize: '1rem', borderRadius: '16px' }} onClick={() => setShowUpload(true)}>
-          <i data-feather="upload"></i> Upload CSV Data
+        <button className="btn btn-primary" style={{ padding: '16px 32px', borderRadius: '20px' }} onClick={() => setShowUpload(true)}>
+          <i data-feather="plus-circle" width="20"></i> Ingest Records
         </button>
       </div>
 
-      <div className="stat-grid" style={{ marginBottom: 48, gap: 32 }}>
-        <div className="stat-card stat-high animate-slide-in" style={{ animationDelay: '0.1s', padding: '40px' }}>
-          <h3 style={{ fontSize: '1.1rem', marginBottom: 16 }}><i data-feather="alert-triangle"></i> Critical Risk</h3>
-          <div className="value" style={{ fontSize: '4.5rem' }}>{highRiskCount}</div>
+      <div className="stat-grid" style={{ marginBottom: 80 }}>
+        <div className="stat-card stat-high animate-slide-in" style={{ animationDelay: '0.1s' }}>
+          <h3><i data-feather="shield-off"></i> High Severity</h3>
+          <div className="value">{highRiskCount}</div>
         </div>
-        <div className="stat-card stat-medium animate-slide-in" style={{ animationDelay: '0.2s', padding: '40px' }}>
-          <h3 style={{ fontSize: '1.1rem', marginBottom: 16 }}><i data-feather="activity"></i> Medium Risk</h3>
-          <div className="value" style={{ fontSize: '4.5rem' }}>{mediumRiskCount}</div>
+        <div className="stat-card stat-medium animate-slide-in" style={{ animationDelay: '0.2s' }}>
+          <h3><i data-feather="help-circle"></i> Monitoring</h3>
+          <div className="value">{mediumRiskCount}</div>
         </div>
-        <div className="stat-card stat-low animate-slide-in" style={{ animationDelay: '0.3s', padding: '40px' }}>
-          <h3 style={{ fontSize: '1.1rem', marginBottom: 16 }}><i data-feather="check-circle"></i> Low Risk</h3>
-          <div className="value" style={{ fontSize: '4.5rem' }}>{lowRiskCount}</div>
+        <div className="stat-card stat-low animate-slide-in" style={{ animationDelay: '0.3s' }}>
+          <h3><i data-feather="check-square"></i> Stable</h3>
+          <div className="value">{lowRiskCount}</div>
         </div>
       </div>
 
-      <div style={{ padding: '0 8px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Student Directory</h2>
-          <div style={{ display: 'flex', gap: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Risk:</span>
-              <select className="input-field" value={riskFilter} onChange={e => setRiskFilter(e.target.value)} style={{ padding: '8px 40px 8px 16px', background: 'transparent' }}>
-                <option value="All">All</option>
-                <option value="High">High</option>
+      <div className="directory-section animate-fade-in">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40 }}>
+          <h2 style={{ fontSize: '2rem' }}>Academic Directory</h2>
+          <div style={{ display: 'flex', gap: 16 }}>
+             <select className="input-field" value={riskFilter} onChange={e => setRiskFilter(e.target.value)} style={{ background: 'var(--surface)', minWidth: '160px' }}>
+                <option value="All">All Severity</option>
+                <option value="High">High Risk</option>
                 <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Class:</span>
-              <select className="input-field" value={classFilter} onChange={e => setClassFilter(e.target.value)} style={{ padding: '8px 40px 8px 16px', background: 'transparent' }}>
-                <option value="All">All</option>
-                <option value="9th">9th</option>
-                <option value="10th">10th</option>
-              </select>
-            </div>
+                <option value="Low">Low Risk</option>
+             </select>
+             <select className="input-field" value={classFilter} onChange={e => setClassFilter(e.target.value)} style={{ background: 'var(--surface)', minWidth: '160px' }}>
+                <option value="All">All Cohorts</option>
+                <option value="9th">Grade 9</option>
+                <option value="10th">Grade 10</option>
+             </select>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ padding: 80, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto', width: 48, height: 48 }}></div></div>
+          <div style={{ padding: 100, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto', width: 64, height: 64, borderWidth: 4 }}></div></div>
         ) : (
-          <div className="table-container animate-fade-in" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-            <table style={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+          <div className="table-container">
+            <table>
               <thead>
                 <tr>
-                  <th style={{ background: 'transparent', borderBottom: '1px solid var(--border)' }}>Student Name & ID</th>
-                  <th style={{ background: 'transparent', borderBottom: '1px solid var(--border)' }}>Class Group</th>
-                  <th style={{ background: 'transparent', borderBottom: '1px solid var(--border)' }}>AI Risk Score</th>
-                  <th style={{ background: 'transparent', borderBottom: '1px solid var(--border)' }}>Status</th>
-                  <th style={{ background: 'transparent', borderBottom: '1px solid var(--border)' }}>Primary Factor</th>
-                  <th style={{ background: 'transparent', borderBottom: '1px solid var(--border)' }}></th>
+                  <th style={{ padding: '24px 32px' }}>Identity Descriptor</th>
+                  <th>Cohort</th>
+                  <th>Stability Logit</th>
+                  <th>Classification</th>
+                  <th>Dominant Driver</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {students.length === 0 && (
-                  <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: 64, color: 'var(--text-muted)', background: 'var(--surface-solid)', borderRadius: '16px' }}>
-                      No students found matching your criteria.
-                    </td>
-                  </tr>
-                )}
                 {students.map(s => (
-                  <tr key={s.id} onClick={() => onSelectStudent(s.id)} style={{ background: 'var(--surface)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                    <td style={{ padding: '24px 32px', borderTopLeftRadius: '16px', borderBottomLeftRadius: '16px', borderBottom: 'none' }}>
-                      <div style={{ fontWeight: 600, color: 'white', fontSize: '1.1rem', marginBottom: 4 }}>{s.name}</div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{s.student_id}</div>
+                  <tr key={s.id} onClick={() => onSelectStudent(s.id)}>
+                    <td style={{ padding: '24px 32px' }}>
+                      <div style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: 4 }}>{s.name}</div>
+                      <code style={{ fontSize: '0.8rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>{s.student_id}</code>
                     </td>
-                    <td style={{ padding: '24px 32px', borderBottom: 'none' }}>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>{s.grade_class}</span>
-                    </td>
-                    <td style={{ padding: '24px 32px', borderBottom: 'none', fontWeight: 700, fontSize: '1.4rem', color: s.risk_level === 'High' ? 'var(--risk-high)' : 'var(--text-main)' }}>{s.risk_score}</td>
-                    <td style={{ padding: '24px 32px', borderBottom: 'none' }}>
-                      <span className={`badge badge-${s.risk_level.toLowerCase()}`} style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                        {s.risk_level === 'High' ? <i data-feather="alert-circle" width="14"></i> : null}
+                    <td><span style={{ fontSize: '1.1rem', opacity: 0.8 }}>{s.grade_class}</span></td>
+                    <td style={{ fontWeight: 800, fontSize: '1.8rem', color: s.risk_level === 'High' ? 'var(--risk-high)' : 'var(--text-main)' }}>{s.risk_score}</td>
+                    <td>
+                      <span className={`badge badge-${s.risk_level.toLowerCase()}`}>
                         {s.risk_level} Risk
                       </span>
                     </td>
-                    <td style={{ padding: '24px 32px', borderBottom: 'none', color: 'var(--text-muted)', fontSize: '0.95rem' }}>{s.top_factors ? s.top_factors.split(',')[0] : 'None calculated'}</td>
-                    <td style={{ padding: '24px 32px', borderBottom: 'none', textAlign: 'right', color: 'var(--accent)', borderTopRightRadius: '16px', borderBottomRightRadius: '16px' }}><i data-feather="arrow-up-right" width="24" height="24"></i></td>
+                    <td style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>{s.top_factors ? s.top_factors.split(',')[0] : 'Scanning...'}</td>
+                    <td style={{ textAlign: 'right', paddingRight: '40px' }}><i data-feather="arrow-right-circle" style={{ color: 'var(--accent)', opacity: 0.5 }}></i></td>
                   </tr>
                 ))}
               </tbody>
@@ -213,7 +206,7 @@ function Dashboard({ onSelectStudent }) {
         )}
       </div>
 
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onSuccess={uploadSuccess} />}
+      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onSuccess={() => { setShowUpload(false); fetchStudents(); }} />}
     </div>
   );
 }
@@ -228,41 +221,31 @@ function UploadModal({ onClose, onSuccess }) {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", file);
-
     try {
-      const res = await fetch(`${API_BASE}/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      if (res.ok) {
-        onSuccess();
-      } else {
-        alert("Error uploading file. Make sure it has correct columns.");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Failed to connect to backend");
-    }
+      const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+      if (res.ok) onSuccess();
+      else alert("Processing Error: Check schema match.");
+    } catch (e) { alert("Core Link Failed"); }
     setLoading(false);
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-      <div className="glass-panel animate-fade-in" style={{ padding: 40, width: '450px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h3 style={{ fontSize: '1.25rem' }}>Upload Student Data</h3>
-          <span onClick={onClose} style={{ cursor: 'pointer', display: 'flex', color: 'var(--text-muted)' }}>
-            <i data-feather="x"></i>
-          </span>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(3, 7, 17, 0.9)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
+      <div className="glass-panel animate-fade-in" style={{ padding: 60, width: '550px', borderRadius: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40 }}>
+          <h3 style={{ fontSize: '2rem' }}>Data Ingestion</h3>
+          <button onClick={onClose} className="btn" style={{ padding: '8px', background: 'transparent', color: 'var(--text-muted)' }}><i data-feather="x" width="28"></i></button>
         </div>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.5 }}>
-          Upload a CSV file containing student records. Required columns include: Student ID, Student Name, Class / Grade, Attendance Percentage, Latest Exam Score...
-        </p>
-        <div className="input-group">
-          <input type="file" accept=".csv" onChange={(e) => setFile(e.target.files[0])} className="input-field" style={{ padding: '16px', border: '2px dashed rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.2)' }} />
+        
+        <div style={{ padding: '40px', border: '2px dashed var(--border)', borderRadius: '24px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', cursor: 'pointer' }} onClick={() => document.getElementById('csv_input').click()}>
+          <i data-feather="file-text" width="48" height="48" style={{ color: 'var(--primary)', marginBottom: 20 }}></i>
+          <p style={{ fontSize: '1.2rem', marginBottom: 8 }}>{file ? file.name : "Select CSV source file"}</p>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Required columns: ID, Name, Grade, Attendance, Score</p>
+          <input id="csv_input" type="file" accept=".csv" onChange={(e) => setFile(e.target.files[0])} style={{ display: 'none' }} />
         </div>
-        <button className="btn btn-primary" style={{ width: '100%', marginTop: 24, padding: '14px' }} onClick={handleUpload} disabled={loading || !file}>
-          {loading ? <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }}></div> Processing ML Pipeline...</span> : <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}><i data-feather="cpu" width="18"></i> Analyze Data Engine</span>}
+
+        <button className="btn btn-primary" style={{ width: '100%', marginTop: 48, padding: '20px', borderRadius: '20px', fontSize: '1.2rem' }} onClick={handleUpload} disabled={loading || !file}>
+          {loading ? "Optimizing Neural Weights..." : "Run ML Analysis"}
         </button>
       </div>
     </div>
@@ -280,19 +263,12 @@ function StudentDetail({ id, onBack }) {
       const res = await fetch(`${API_BASE}/students/${id}`);
       const json = await res.json();
       setData(json);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchDetail();
-  }, [id]);
-
-  useEffect(() => {
-    if (window.feather) window.feather.replace();
-  });
+  useEffect(() => { fetchDetail(); }, [id]);
+  useEffect(() => { if (window.feather) window.feather.replace(); });
 
   const handleLogIntervention = async () => {
     if (!action.trim()) return;
@@ -300,154 +276,87 @@ function StudentDetail({ id, onBack }) {
       await fetch(`${API_BASE}/students/${id}/interventions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          action
-        })
+        body: JSON.stringify({ date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), action })
       });
-      setAction("");
-      fetchDetail(); // Refresh list
-    } catch (e) {
-      console.error(e);
-    }
+      setAction(""); fetchDetail();
+    } catch (e) { console.error(e); }
   };
 
-  if (loading) return <div style={{ padding: 60, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto' }}></div></div>;
-  if (!data || !data.student) return <div style={{ textAlign: 'center', padding: 40 }}>Error loading student.</div>;
+  if (loading) return <div style={{ padding: 100, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto' }}></div></div>;
+  if (!data || !data.student) return <div style={{ textAlign: 'center', padding: 100 }}>Core Trace Null.</div>;
 
   const { student, interventions } = data;
-  
-  const suggestedActions = [
-    "Conduct a home visit",
-    "Arrange a counselling session",
-    "Assign a peer study buddy",
-    "Assist with scholarship applications"
-  ];
+  const suggestedActions = ["Home visit protocol", "Clinical counseling", "Peer tutoring node", "Financial aid scan"];
 
   return (
     <div className="animate-fade-in">
-      <button className="btn btn-outline" style={{ marginBottom: 32 }} onClick={onBack}>
-        <i data-feather="arrow-left" width="16"></i> Back to Dashboard
+      <button className="btn btn-outline" style={{ marginBottom: 48, padding: '12px 24px', borderRadius: '16px' }} onClick={onBack}>
+        <i data-feather="corner-up-left" width="18"></i> Return to Fleet
       </button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 32 }}>
-        
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-          
-          <div className="glass-panel" style={{ padding: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 40 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+          <div className="glass-panel" style={{ padding: 60, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <h1 style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1 }}>{student.name}</h1>
-              </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-                <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{student.grade_class}</span> • ID: {student.student_id}
-              </p>
+              <h1 style={{ fontSize: '3.5rem', marginBottom: 8 }}>{student.name}</h1>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.3rem' }}>{student.grade_class} • Protocol ID: <code style={{ color: 'var(--accent)' }}>{student.student_id}</code></p>
             </div>
-            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Risk Score</span>
-                  <div style={{ fontSize: '3.5rem', fontWeight: 700, color: student.risk_level === 'High' ? 'var(--risk-high)' : 'var(--text-main)', lineHeight: 1, textShadow: '0 2px 10px rgba(0,0,0,0.3)', fontFamily: 'Outfit' }}>
-                    {student.risk_score}
-                  </div>
-                </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '6rem', fontWeight: 900, lineHeight: 1, textShadow: '0 0 40px ' + (student.risk_level === 'High' ? 'var(--risk-high-glow)' : 'var(--accent-glow)') }}>
+                {student.risk_score}
               </div>
-              <span className={`badge badge-${student.risk_level.toLowerCase()}`} style={{ padding: '6px 16px', fontSize: '0.85rem' }}>
-                {student.risk_level === 'High' ? <i data-feather="alert-octagon" width="14"></i> : null}
-                {student.risk_level} Risk
-              </span>
+              <p style={{ textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--text-muted)', marginTop: 12 }}>Stability Index</p>
             </div>
           </div>
 
-          <div className="glass-card animate-slide-in" style={{ padding: 32, animationDelay: '0.1s' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '1.25rem' }}>
-              <i data-feather="cpu" style={{ color: 'var(--accent)' }}></i> 
-              Why is {student.name.split(' ')[0]} at risk?
-            </h3>
-            <div className="explanation-box">
+          <div className="glass-card animate-slide-in" style={{ padding: 48 }}>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: 24, color: 'var(--accent)' }}><i data-feather="cpu"></i> AI Attribution Insights</h3>
+            <div className="explanation-box" style={{ padding: '32px', fontSize: '1.2rem', borderRadius: '24px', background: 'rgba(0,0,0,0.3)', border: 'none' }}>
               {student.llm_explanation}
             </div>
-
-            <div style={{ marginTop: 32 }}>
-              <h4 style={{ marginBottom: 16, color: 'var(--text-muted)', fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Top Contributing Factors</h4>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {student.top_factors && student.top_factors.split(',').map((f, i) => (
-                  <span key={i} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '999px', fontSize: '0.9rem' }}>
-                    {f.trim()}
-                  </span>
-                ))}
-              </div>
-            </div>
-            
-            <div style={{ marginTop: 32, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-              <div className="metric-card">
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Attendance</span>
-                <div className="metric-value">{student.attendance_pct}%</div>
-              </div>
-              <div className="metric-card">
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Latest Exam</span>
-                <div className="metric-value">{student.latest_exam_score}%</div>
-              </div>
-              <div className="metric-card">
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Commute</span>
-                <div className="metric-value">{student.distance_km}km</div>
-              </div>
+            <div style={{ marginTop: 48 }}>
+               <h4 style={{ color: 'var(--text-muted)', marginBottom: 20, fontSize: '0.9rem', textTransform: 'uppercase' }}>Weighted Risk Parameters</h4>
+               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                 {student.top_factors && student.top_factors.split(',').map((f, i) => (
+                   <span key={i} className="glass-card" style={{ padding: '12px 24px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px', fontSize: '1.1rem' }}>{f.trim()}</span>
+                 ))}
+               </div>
             </div>
           </div>
-          
         </div>
 
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-          
-          {student.risk_level === 'High' && (
-            <div className="glass-card animate-slide-in" style={{ padding: 32, background: 'linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(190, 18, 60, 0.05))', borderColor: 'rgba(244, 63, 94, 0.3)', animationDelay: '0.2s' }}>
-              <h3 style={{ color: 'var(--risk-high)', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i data-feather="zap"></i> Suggested Interventions
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {suggestedActions.map((actionText, i) => (
-                  <button key={i} className="btn" style={{ background: 'rgba(15, 23, 42, 0.6)', color: 'var(--text-main)', border: '1px solid rgba(244, 63, 94, 0.2)', justifyContent: 'flex-start', textAlign: 'left', padding: '12px 16px' }} onClick={() => setAction(actionText)}>
-                    <i data-feather="arrow-right" width="16" style={{ color: 'var(--risk-high)', opacity: 0.7 }}></i> {actionText}
-                  </button>
-                ))}
-              </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+          <div className="glass-card animate-slide-in" style={{ padding: 48, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(15, 23, 42, 0.4))' }}>
+            <h3 style={{ marginBottom: 24 }}><i data-feather="alert-octagon" style={{ color: 'var(--risk-high)' }}></i> Recommended Ops</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {suggestedActions.map((act, i) => (
+                <button key={i} className="btn btn-outline" style={{ justifyContent: 'flex-start', padding: '20px', borderRadius: '18px', fontSize: '1.1rem' }} onClick={() => setAction(act)}>
+                  <i data-feather="chevron-right" width="16" style={{ color: 'var(--primary)' }}></i> {act}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
 
-          <div className="glass-card animate-slide-in" style={{ padding: 32, flex: 1, animationDelay: '0.3s' }}>
-            <h3 style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <i data-feather="list" style={{ color: 'var(--accent)' }}></i> Intervention Log
-            </h3>
-            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-              <input type="text" className="input-field" style={{ flex: 1 }} placeholder="Record action taken..." value={action} onChange={e => setAction(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogIntervention()} />
-              <button className="btn btn-primary" onClick={handleLogIntervention}>Log</button>
+          <div className="glass-panel animate-slide-in" style={{ padding: 48, flex: 1, borderRadius: '32px' }}>
+            <h3 style={{ marginBottom: 32 }}><i data-feather="activity"></i> Intervention History</h3>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
+              <input type="text" className="input-field" style={{ flex: 1, background: 'var(--surface)' }} placeholder="Append event..." value={action} onChange={e => setAction(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogIntervention()} />
+              <button className="btn btn-primary" onClick={handleLogIntervention} style={{ padding: '0 24px', borderRadius: '14px' }}>Log</button>
             </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '400px', overflowY: 'auto', paddingRight: 8 }}>
-              {interventions.length === 0 ? (
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', padding: 24, textAlign: 'center', background: 'rgba(0,0,0,0.1)', borderRadius: 8 }}>
-                  No interventions logged yet.
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {interventions.reverse().map(inv => (
+                <div key={inv.id} className="intervention-item" style={{ background: 'rgba(255,255,255,0.03)', border: 'none', padding: '24px', borderRadius: '16px' }}>
+                   <div style={{ fontSize: '1.1rem' }}>{inv.action}</div>
+                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: 4 }}>{inv.date}</div>
                 </div>
-              ) : (
-                interventions.slice().reverse().map(inv => (
-                  <div key={inv.id} className="intervention-item">
-                    <div style={{ fontSize: '0.95rem' }}>{inv.action}</div>
-                    <div style={{ fontWeight: 500, fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{inv.date}</div>
-                  </div>
-                ))
-              )}
+              ))}
             </div>
           </div>
-
         </div>
-
       </div>
     </div>
   );
 }
 
-// Mount App
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
