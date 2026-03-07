@@ -1,197 +1,199 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Early Warning System</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Early Warning System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="bg-gradient-to-b from-purple-900 to-purple-300 min-h-screen text-white font-sans">
 
-<header class="p-6">
-<h1 class="text-3xl md:text-4xl font-black tracking-tighter">STUDENT RISK DASHBOARD</h1>
-<p class="text-purple-200 mt-2 font-extrabold italic">ANNA UNIVERSITY</p>
+<header class="p-6 bg-opacity-40 relative">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+        <!-- Left - Title -->
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-tighter">STUDENT RISK DASHBOARD</h1>
+            <p class="text-purple-200 mt-2 font-extrabold italic">KANCHIPURAM MATRIC.HR.SEC.SCHOOL</p>
+        </div>
+
+        <!-- Right - Buttons -->
+        <div class="flex items-center gap-3 md:gap-5 flex-wrap">
+            <!-- Alert Button -->
+            <button class="bg-red-600 hover:bg-red-700 text-white font-black px-5 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 text-sm md:text-base">
+                <span class="text-lg md:text-xl">🔔</span> Alert
+            </button>
+
+            <!-- Report Button -->
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-5 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 text-sm md:text-base">
+                <span class="text-lg md:text-xl">📊</span> Report
+            </button>
+
+            <!-- Admin Dropdown -->
+            <div class="relative">
+                <button id="adminBtn" class="bg-purple-800 hover:bg-purple-900 text-white font-black px-5 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 text-sm md:text-base">
+                    <span class="text-lg md:text-xl">👤</span> Admin
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div id="adminDropdown" class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl z-50 border border-purple-300 overflow-hidden">
+                    <a href="#" class="block px-6 py-3 text-purple-900 hover:bg-purple-100 font-bold border-b border-purple-100">Dashboard Settings</a>
+                    <a href="#" class="block px-6 py-3 text-purple-900 hover:bg-purple-100 font-bold border-b border-purple-100">Manage Users</a>
+                    <a href="#" class="block px-6 py-3 text-purple-900 hover:bg-purple-100 font-bold border-b border-purple-100">View Logs</a>
+                    <a href="#" class="block px-6 py-3 text-red-700 hover:bg-red-50 font-bold">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 
 <div class="max-w-7xl mx-auto p-6 space-y-6">
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        
+        <div class="md:col-span-1 flex flex-col gap-4">
+            <div class="bg-gradient-to-r from-red-600 to-red-500 p-4 rounded-xl shadow-lg border-l-8 border-red-900">
+                <h2 class="text-xs font-black uppercase tracking-widest text-white">High Risk</h2>
+                <p class="text-4xl font-black mt-1">5</p>
+            </div>
+            
+            <div class="bg-gradient-to-r from-yellow-500 to-yellow-400 p-4 rounded-xl shadow-lg border-l-8 border-yellow-700 text-black">
+                <h2 class="text-xs font-black uppercase tracking-widest">Medium Risk</h2>
+                <p class="text-4xl font-black mt-1">12</p>
+            </div>
+            
+            <div class="bg-gradient-to-r from-green-600 to-green-500 p-4 rounded-xl shadow-lg border-l-8 border-green-900 text-white">
+                <h2 class="text-xs font-black uppercase tracking-widest">Low Risk</h2>
+                <p class="text-4xl font-black mt-1">18</p>
+            </div>
+        </div>
 
-<div class="md:col-span-1 flex flex-col gap-4">
+        <div class="md:col-span-3 bg-gradient-to-br from-black-800 to-black-300 p-8 rounded-xl shadow-2xl border-2 border-purple-400 flex flex-col justify-center">
+            <h2 class="text-2xl font-black mb-2 text-white uppercase tracking-tighter">Student Data Ingestion</h2>
+            <p class="text-purple-200 mb-6 font-bold">Import CSV or Excel files to update the risk engine.</p>
+            
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <input type="file" class="flex-1 border-4 border-dashed border-purple-300 p-6 rounded-2xl bg-white text-black font-black w-full cursor-pointer hover:border-white transition-colors">
+                <button class="bg-black hover:bg-purple-900 text-white font-black px-10 py-6 rounded-2xl transition-all shadow-xl text-lg transform hover:scale-105">
+                    UPLOAD DATA
+                </button>
+            </div>
+        </div>
+    </div>
 
-<div class="bg-gradient-to-r from-red-600 to-red-500 p-4 rounded-xl shadow-lg border-l-8 border-red-900">
-<h2 class="text-xs font-black uppercase tracking-widest">High Risk</h2>
-<p class="text-4xl font-black mt-1">5</p>
-</div>
+    <div class="bg-white p-8 rounded-2xl shadow-2xl overflow-x-auto border-t-8 border-purple-700">
+        <h2 class="text-2xl font-black mb-6 text-purple-950 uppercase tracking-tight">Student Risk Overview</h2>
+        <table class="w-full text-black border-collapse">
+            <thead>
+                <tr class="bg-purple-950 text-white">
+                    <th class="p-4 border text-left font-black uppercase text-sm">Student</th>
+                    <th class="p-4 border text-center font-black uppercase text-sm">Class</th>
+                    <th class="p-4 border text-center font-black uppercase text-sm">Score</th>
+                    <th class="p-4 border text-center font-black uppercase text-sm">Level</th>
+                    <th class="p-4 border text-left font-black uppercase text-sm">Key Factor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="hover:bg-purple-50 transition-colors">
+                    <td class="p-4 border font-black text-purple-900">Ravi Kumar</td>
+                    <td class="p-4 border text-center font-extrabold">10</td>
+                    <td class="p-4 border text-center font-extrabold">78</td>
+                    <td class="p-4 border font-black text-red-600 text-center text-lg">HIGH</td>
+                    <td class="p-4 border italic font-black text-gray-700">Low Attendance</td>
+                </tr>
+                <tr class="hover:bg-purple-50 transition-colors">
+                    <td class="p-4 border font-black text-purple-900">Anita</td>
+                    <td class="p-4 border text-center font-extrabold">9</td>
+                    <td class="p-4 border text-center font-extrabold">45</td>
+                    <td class="p-4 border font-black text-yellow-600 text-center text-lg">MEDIUM</td>
+                    <td class="p-4 border italic font-black text-gray-700">Poor Grades</td>
+                </tr>
+                <tr class="hover:bg-purple-50 transition-colors">
+                    <td class="p-4 border font-black text-purple-900 text-lg">Imran</td>
+                    <td class="p-4 border text-center font-extrabold">10</td>
+                    <td class="p-4 border text-center font-extrabold">22</td>
+                    <td class="p-4 border font-black text-green-600 text-center text-lg">LOW</td>
+                    <td class="p-4 border italic font-black text-gray-700">Stable</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-<div class="bg-gradient-to-r from-yellow-500 to-yellow-400 p-4 rounded-xl shadow-lg border-l-8 border-yellow-700 text-black">
-<h2 class="text-xs font-black uppercase tracking-widest">Medium Risk</h2>
-<p class="text-4xl font-black mt-1">12</p>
-</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-gradient-to-br from-gray-900 via-purple-900 to-purple-800 p-8 rounded-2xl shadow-lg border border-purple-400 text-white"> 
+            <h2 class="text-xl font-black mb-4 uppercase">Intervention Playbook</h2>
+            <ul class="space-y-3">
+                <li class="bg-white bg-opacity-10 p-4 rounded-xl font-black flex items-center gap-3">
+                    <span class="text-2xl">➔</span> Counseling Session
+                </li>
+                <li class="bg-white bg-opacity-10 p-4 rounded-xl font-black flex items-center gap-3">
+                    <span class="text-2xl">➔</span> Parent Meeting
+                </li>
+                <li class="bg-white bg-opacity-10 p-4 rounded-xl font-black flex items-center gap-3">
+                    <span class="text-2xl">➔</span> Academic Support
+                </li>
+                <li class="bg-white bg-opacity-10 p-4 rounded-xl font-black flex items-center gap-3">
+                    <span class="text-2xl">➔</span> Behavioral Monitoring
+                </li>
+            </ul>
+        </div>
 
-<div class="bg-gradient-to-r from-green-600 to-green-500 p-4 rounded-xl shadow-lg border-l-8 border-green-900">
-<h2 class="text-xs font-black uppercase tracking-widest">Low Risk</h2>
-<p class="text-4xl font-black mt-1">18</p>
-</div>
-
-</div>
-
-<div class="md:col-span-3 bg-gradient-to-br from-purple-900 to-violet-700 p-8 rounded-xl shadow-2xl border-2 border-purple-400 flex flex-col justify-center">
-
-<h2 class="text-2xl font-black mb-2 uppercase">Student Data Ingestion</h2>
-<p class="text-purple-200 mb-6 font-bold">
-Import CSV or Excel files to update the risk engine.
-</p>
-
-<div class="flex flex-col md:flex-row gap-4 items-center">
-
-<input type="file"
-class="flex-1 border-4 border-dashed border-purple-300 p-6 rounded-2xl bg-white text-black font-black w-full cursor-pointer">
-
-<button class="bg-black hover:bg-purple-900 text-white font-black px-10 py-6 rounded-2xl shadow-xl text-lg transform hover:scale-105">
-UPLOAD DATA
-</button>
-
-</div>
-</div>
-</div>
-
-<div class="bg-white p-8 rounded-2xl shadow-2xl overflow-x-auto border-t-8 border-purple-700">
-
-<h2 class="text-2xl font-black mb-6 text-purple-950 uppercase">
-Student Risk Overview
-</h2>
-
-<table class="w-full text-black border-collapse">
-
-<thead>
-<tr class="bg-purple-950 text-white">
-<th class="p-4 border text-left">Student</th>
-<th class="p-4 border text-center">Class</th>
-<th class="p-4 border text-center">Score</th>
-<th class="p-4 border text-center">Level</th>
-<th class="p-4 border text-left">Key Factor</th>
-</tr>
-</thead>
-
-<tbody>
-
-<tr class="hover:bg-purple-50">
-<td class="p-4 border font-bold text-purple-900">Ravi Kumar</td>
-<td class="p-4 border text-center">10</td>
-<td class="p-4 border text-center">78</td>
-<td class="p-4 border text-red-600 text-center font-bold">HIGH</td>
-<td class="p-4 border italic">Low Attendance</td>
-</tr>
-
-<tr class="hover:bg-purple-50">
-<td class="p-4 border font-bold text-purple-900">Anita</td>
-<td class="p-4 border text-center">9</td>
-<td class="p-4 border text-center">45</td>
-<td class="p-4 border text-yellow-600 text-center font-bold">MEDIUM</td>
-<td class="p-4 border italic">Poor Grades</td>
-</tr>
-
-<tr class="hover:bg-purple-50">
-<td class="p-4 border font-bold text-purple-900">Imran</td>
-<td class="p-4 border text-center">10</td>
-<td class="p-4 border text-center">22</td>
-<td class="p-4 border text-green-600 text-center font-bold">LOW</td>
-<td class="p-4 border italic">Stable</td>
-</tr>
-
-</tbody>
-</table>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-<div class="bg-gradient-to-br from-pink-500 via-purple-400 to-purple-600 p-8 rounded-2xl shadow-lg text-white">
-
-<h2 class="text-xl font-black mb-4 uppercase">
-Intervention Playbook
-</h2>
-
-<ul class="space-y-3">
-
-<li class="bg-white bg-opacity-10 p-4 rounded-xl flex items-center gap-3">
-<span class="text-2xl">➔</span> Counseling Session
-</li>
-
-<li class="bg-white bg-opacity-10 p-4 rounded-xl flex items-center gap-3">
-<span class="text-2xl">➔</span> Parent Meeting
-</li>
-
-<li class="bg-white bg-opacity-10 p-4 rounded-xl flex items-center gap-3">
-<span class="text-2xl">➔</span> Academic Support
-</li>
-
-<li class="bg-white bg-opacity-10 p-4 rounded-xl flex items-center gap-3">
-<span class="text-2xl">➔</span> Behavioral Monitoring
-</li>
-
-</ul>
-</div>
-
-<div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-purple-200">
-
-<h2 class="text-xl font-black mb-4 text-purple-950 uppercase text-center">
-Risk Distribution
-</h2>
-
-<div style="height:250px;">
-<canvas id="riskChart"></canvas>
-</div>
-
-</div>
-</div>
-
+        <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-purple-200">
+            <h2 class="text-xl font-black mb-4 text-purple-950 uppercase text-center">Risk Distribution</h2>
+            <div style="height: 250px;">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer class="text-center p-10 mt-12 bg-black text-white font-black tracking-[0.2em] uppercase text-sm">
-AI Early Warning System • ANNA UNIVERSITY • 2026
+    AI Early Warning System &bull; ANNA UNIVERSITY &bull; 2026
 </footer>
 
 <script>
-window.onload = function(){
-
+// Chart code (unchanged)
 const ctx = document.getElementById('riskChart');
-
-new Chart(ctx,{
-type:'doughnut',
-
-data:{
-labels:['High Risk','Medium Risk','Low Risk'],
-
-datasets:[{
-data:[5,12,18],
-backgroundColor:['#dc2626','#eab308','#16a34a'],
-borderWidth:5,
-borderColor:'#ffffff'
-}]
-},
-
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{
-legend:{
-position:'bottom'
-}
-}
-}
-
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+        datasets: [{
+            data: [5, 12, 18],
+            backgroundColor: ['#dc2626', '#eab308', '#16a34a'],
+            hoverOffset: 20,
+            borderWidth: 5,
+            borderColor: '#ffffff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                position: 'bottom', 
+                labels: { font: { weight: '900', size: 14 }, color: '#1e1b4b' } 
+            }
+        }
+    }
 });
 
-}
+// Admin dropdown toggle
+document.getElementById('adminBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('adminDropdown');
+    dropdown.classList.toggle('hidden');
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const adminArea = document.querySelector('.relative');
+    if (!adminArea.contains(event.target)) {
+        document.getElementById('adminDropdown').classList.add('hidden');
+    }
+});
 </script>
 
 </body>
 </html>
-
