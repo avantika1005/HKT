@@ -225,24 +225,9 @@ System Update – Data refreshed
 
 <h2 class="text-xl font-black mb-4 uppercase">Intervention Playbook</h2>
 
-<div class="space-y-3">
-
-<button class="w-full bg-white/10 p-4 rounded-xl font-black">
-➔ Counseling Session
-</button>
-
-<button class="w-full bg-white/10 p-4 rounded-xl font-black">
-➔ Parent Meeting
-</button>
-
-<button class="w-full bg-white/10 p-4 rounded-xl font-black">
-➔ Academic Support
-</button>
-
-<button class="w-full bg-white/10 p-4 rounded-xl font-black">
-➔ Behavioral Monitoring
-</button>
-
+<div id="playbookContainer" class="space-y-3">
+    <!-- populated by app.js -->
+    <p class="text-sm italic text-purple-200">Loading interventions…</p>
 </div>
 
 </div>
@@ -258,6 +243,15 @@ Risk Distribution
 <canvas id="riskChart"></canvas>
 </div>
 
+</div>
+
+<div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-green-200 mt-6">
+    <h2 class="text-xl font-black mb-4 text-green-950 uppercase text-center">
+        Intervention Analytics
+    </h2>
+    <div id="analyticsContainer" class="text-center text-sm font-bold text-gray-700">
+        Loading analytics…
+    </div>
 </div>
 
 </div>

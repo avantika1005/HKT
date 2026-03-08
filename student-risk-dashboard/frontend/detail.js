@@ -114,6 +114,102 @@ function renderDetail(data) {
     if (data.comparison) {
         renderComparison(data.comparison);
     }
+
+    // interventions section
+    setupInterventionSection(data.interventions || []);
+}
+
+// ---------------------------------------------------------------------------
+// intervention helper methods
+// ---------------------------------------------------------------------------
+
+async function fetchInterventionLibrary() {
+    try {
+        const res = await fetch(`${API_BASE}/interventions/library`);
+        if (res.ok) return await res.json();
+    } catch (e) {
+        console.error("failed to fetch intervention library", e);
+    }
+    return [];
+}
+
+function populateInterventionDropdown(library) {
+    const select = document.getElementById('interventionType');
+    select.innerHTML = library.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+}
+
+function setupInterventionSection(interventions) {
+    // fill the dropdown using library data
+    fetchInterventionLibrary().then(populateInterventionDropdown);
+
+    // default date to today
+    const dateInput = document.getElementById('interventionDate');
+    if (dateInput) {
+        const today = new Date().toISOString().slice(0,10);
+        dateInput.value = today;
+    }
+
+    document.getElementById('saveInterventionBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await submitIntervention();
+    });
+
+    renderInterventions(interventions);
+}
+
+async function submitIntervention() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('id');
+    const payload = {
+        date: document.getElementById('interventionDate').value,
+        intervention_type: document.getElementById('interventionType').value,
+        teacher_name: document.getElementById('teacherName').value,
+        notes: document.getElementById('interventionNotes').value,
+    };
+
+    try {
+        const resp = await fetch(`${API_BASE}/students/${studentId}/interventions`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        if (!resp.ok) throw new Error('failed to save');
+        // refresh details to show new intervention
+        await fetchStudentDetails();
+        // clear notes field
+        document.getElementById('interventionNotes').value = '';
+    } catch (err) {
+        console.error('error logging intervention', err);
+        alert('Could not log intervention; please try again.');
+    }
+}
+
+function renderInterventions(list) {
+    const body = document.getElementById('interventionTableBody');
+    if (!body) return;
+
+    body.innerHTML = list.map(inv => {
+        const baseStr = `${inv.baseline_attendance_pct || '-'}% / ${inv.baseline_exam_score || '-'} / ${inv.baseline_risk_score || '-'} `;
+        let outcome = '';
+        if (inv.evaluated) {
+            const parts = [];
+            if (inv.attendance_status) parts.push(`Att: ${inv.attendance_status}`);
+            if (inv.score_status) parts.push(`Score: ${inv.score_status}`);
+            if (inv.risk_status) parts.push(`Risk: ${inv.risk_status}`);
+            outcome = parts.join(', ');
+        } else {
+            outcome = inv.days_until_evaluation ? `Pending (${inv.days_until_evaluation}d)` : 'Pending';
+        }
+        return `
+            <tr class="border-b border-indigo-50 hover:bg-indigo-50/50 transition-colors">
+                <td class="py-2 px-2 text-sm">${inv.date}</td>
+                <td class="py-2 px-2 text-sm font-bold">${inv.intervention_type || ''}</td>
+                <td class="py-2 px-2 text-sm">${inv.teacher_name || ''}</td>
+                <td class="py-2 px-2 text-sm">${baseStr}</td>
+                <td class="py-2 px-2 text-sm">${outcome}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderComparison(comparison) {
