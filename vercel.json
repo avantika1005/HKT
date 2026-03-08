@@ -1,0 +1,9 @@
+{
+  "public": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/student-risk-dashboard/frontend/$1"
+    }
+  ]
+}
