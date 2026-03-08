@@ -452,4 +452,7 @@ def get_district_heatmap(db: Session = Depends(get_db)):
     return result
 
 # Serve frontend static files
-app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
+# Use absolute paths for deployment robustness
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend"))
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
