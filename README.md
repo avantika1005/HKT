@@ -35,23 +35,6 @@ The **Student Risk Dashboard** is an AI-powered early warning system developed t
 * 💻 **Frontend:** HTML, CSS, Tailwind CSS, JavaScript
 * 📊 **Data Visualization:** Chart.js
 * 🧠 **AI Logic:** Risk scoring model with factor explanation
-* 🛠 **Tools:** GitHub, Antigravity, ChatGPT
-
----
-
-### 🚀 Deployment (Render)
-
-1. **GitHub**: Push this repository to GitHub.
-2. **Render Dashboard**:
-   - Create a new **Web Service**.
-   - Connect your GitHub repository.
-   - Set **Root Directory** to `student-risk-dashboard`.
-   - The **Build Command** and **Start Command** will be automatically picked up from `render.yaml`.
-3. **Environment Variables**:
-   - Add `OPENAI_API_KEY` in the **Environment** tab.
-4. **Deploy**: Click **Create Web Service**.
-
-> [!NOTE]
-> This service uses a local SQLite database (`sql_app.db`). Data uploaded via CSV will be reset when the service restarts unless a Persistent Disk is configured in Render.
+* 🛠 **Tools:** Antigravity, ChatGPT
 
 

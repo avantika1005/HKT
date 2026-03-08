@@ -6,4 +6,3 @@ pandas
 python-dotenv
 python-multipart
 openai
-gunicorn
