@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intervention Analytics - KMHSC</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="index.css">
+<script src="analytics.js" defer></script>
+</head>
+<body class="bg-gradient-to-b from-purple-900 to-purple-300 min-h-screen text-white font-sans">
+
+<header class="p-6 bg-opacity-40 relative">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-tighter uppercase">Intervention Effectiveness</h1>
+            <p class="text-purple-200 mt-2 font-extrabold italic uppercase">Evidence-Based Outcome Tracking</p>
+        </div>
+        <div class="flex gap-4">
+            <a href="index.html" class="bg-purple-800 hover:bg-purple-900 text-white font-black px-5 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all text-sm md:text-base">
+                🏠 Dashboard
+            </a>
+            <a href="students.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-5 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all text-sm md:text-base">
+                📋 Student List
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto p-6 space-y-10">
+    <!-- OVERALL METRICS -->
+    <div id="loadingState" class="bg-white p-12 rounded-2xl shadow-2xl text-center">
+        <p class="text-purple-900 text-2xl font-black animate-pulse uppercase">Aggregating Effectiveness Data...</p>
+    </div>
+
+    <div id="analyticsContent" class="hidden space-y-10">
+        <!-- TOP ROW STATS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-l-[12px] border-emerald-500 text-black">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Highest Success Rate</p>
+                <h3 id="top_intervention" class="text-2xl font-black text-indigo-950 mt-1 uppercase">-</h3>
+                <p id="top_rate" class="text-4xl font-black text-emerald-600 mt-2">0%</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-l-[12px] border-indigo-500 text-black">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Evaluated Actions</p>
+                <h3 class="text-2xl font-black text-indigo-950 mt-1 uppercase">Interventions</h3>
+                <p id="total_evaluated" class="text-4xl font-black text-indigo-600 mt-2">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-l-[12px] border-rose-500 text-black">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Avg. Attendance Boost</p>
+                <h3 class="text-2xl font-black text-indigo-950 mt-1 uppercase">School-Wide</h3>
+                <p id="avg_boost" class="text-4xl font-black text-rose-600 mt-2">+0%</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- CHART: SUCCESS RATES -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border-t-8 border-indigo-900 text-black">
+                <h2 class="text-2xl font-black mb-8 text-indigo-950 uppercase flex items-center gap-2">
+                    <span>🔥</span> Success Rate Comparison
+                </h2>
+                <div class="h-[400px] relative">
+                    <canvas id="successChart"></canvas>
+                </div>
+            </div>
+
+            <!-- TABLE: DETAILED PERFORMANCE -->
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border-t-8 border-purple-900 text-black">
+                <h2 class="text-2xl font-black mb-8 text-purple-950 uppercase flex items-center gap-2">
+                    <span>📊</span> Evidence-Based Results
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b-2 border-purple-50">
+                                <th class="py-4 px-2 font-black text-purple-400 uppercase text-xs">Action</th>
+                                <th class="py-4 px-2 font-black text-purple-900 uppercase text-xs">Success</th>
+                                <th class="py-4 px-2 font-black text-purple-900 uppercase text-xs">Att. Gain</th>
+                                <th class="py-4 px-2 font-black text-purple-900 uppercase text-xs">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analyticsTableBody">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSIGHTS SECTION -->
+        <div class="bg-black/20 backdrop-blur-md p-10 rounded-3xl border-2 border-white/10 text-center">
+            <h2 class="text-3xl font-black text-white uppercase mb-4 tracking-tighter italic">Data-Driven Strategy Insight</h2>
+            <p id="strategy_insight" class="text-xl font-bold text-purple-100 max-w-4xl mx-auto leading-relaxed">
+                Loading school-wide effectiveness data to provide strategic recommendations...
+            </p>
+        </div>
+    </div>
+</div>
+
+<footer class="w-full text-center p-6 mt-12 bg-slate-950 text-slate-200 font-bold tracking-widest uppercase text-sm">
+    KMHSC • 2026 © Internal Strategy Dashboard
+</footer>
+
+</body>
+</html>

@@ -15,7 +15,11 @@ async function fetchStudentDetails() {
         if (!response.ok) throw new Error("Failed to fetch student details");
         
         const data = await response.json();
-        renderDetail(data);
+        if (data.student) {
+            renderDetail(data);
+            fetchInterventions(studentId);
+            fetchSchemes(studentId);
+        }
     } catch (error) {
         console.error("Error fetching details:", error);
         document.getElementById('loadingState').innerHTML = `
@@ -113,6 +117,101 @@ function renderDetail(data) {
 
     if (data.comparison) {
         renderComparison(data.comparison);
+    }
+
+    if (data.interventions) {
+        renderInterventionHistory(data.interventions);
+    }
+}
+
+function renderInterventionHistory(interventions) {
+    const tableBody = document.getElementById('interventionHistoryBody');
+    if (!interventions || interventions.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-gray-400 font-bold italic">No interventions recorded for this student.</td></tr>`;
+        return;
+    }
+
+    tableBody.innerHTML = interventions.map(inv => {
+        let outcomeBadge = '<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-lg text-[10px] font-black uppercase">Pending</span>';
+        if (inv.is_evaluated) {
+            const color = inv.outcome_status === 'Improved' ? 'bg-green-100 text-green-700' : 
+                         (inv.outcome_status === 'Declined' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700');
+            outcomeBadge = `<span class="px-3 py-1 ${color} rounded-lg text-[10px] font-black uppercase">${inv.outcome_status}</span>`;
+        }
+
+        const baselineInfo = `
+            <div class="text-[10px] space-y-0.5">
+                <p class="font-bold text-gray-500">ATT: <span class="text-indigo-900">${inv.baseline_attendance ?? '-'}%</span></p>
+                <p class="font-bold text-gray-500">SCORE: <span class="text-indigo-900">${inv.baseline_score ?? '-'}</span></p>
+                <p class="font-bold text-gray-500">RISK: <span class="text-indigo-900">${inv.baseline_risk_score ?? '-'}/100</span></p>
+            </div>
+        `;
+
+        const evolutionInfo = inv.is_evaluated ? `
+            <div class="text-[10px] space-y-0.5">
+                <p class="font-bold text-gray-500">ATT: <span class="${(inv.outcome_attendance > inv.baseline_attendance) ? 'text-green-600' : 'text-red-500'} font-black">${inv.outcome_attendance}%</span></p>
+                <p class="font-bold text-gray-500">SCORE: <span class="${(inv.outcome_score > inv.baseline_score) ? 'text-green-600' : 'text-red-500'} font-black">${inv.outcome_score}</span></p>
+                <p class="font-bold text-gray-500">RISK: <span class="${(inv.outcome_risk_score < inv.baseline_risk_score) ? 'text-green-600' : 'text-red-500'} font-black">${inv.outcome_risk_score}/100</span></p>
+            </div>
+        ` : '<span class="text-[10px] font-bold text-gray-300 italic">Waiting for 30-day data...</span>';
+
+        return `
+            <tr class="border-b border-indigo-50 hover:bg-gray-50 transition-colors">
+                <td class="py-4 px-2">
+                    <p class="text-xs font-black text-indigo-950 uppercase">${inv.action}</p>
+                    <p class="text-[10px] font-bold text-gray-400 mt-0.5">${inv.date} • By ${inv.teacher_name || 'System'}</p>
+                    <p class="text-[10px] italic text-gray-500 mt-1 line-clamp-1" title="${inv.notes || ''}">${inv.notes || 'No notes.'}</p>
+                </td>
+                <td class="py-4 px-2">${baselineInfo}</td>
+                <td class="py-4 px-2">${evolutionInfo}</td>
+                <td class="py-4 px-2 text-center">${outcomeBadge}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function openInterventionModal() {
+    const modal = document.getElementById('interventionModal');
+    modal.classList.remove('hidden');
+    
+    // Set baselines in modal for confirmation
+    document.getElementById('modal_att').innerText = document.getElementById('disp_attendance').innerText;
+    document.getElementById('modal_risk').innerText = document.getElementById('disp_score').innerText;
+    document.getElementById('modal_exam').innerText = document.getElementById('disp_latest').innerText;
+}
+
+function closeInterventionModal() {
+    document.getElementById('interventionModal').classList.add('hidden');
+    document.getElementById('interventionForm').reset();
+}
+
+async function submitIntervention(event) {
+    event.preventDefault();
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('id');
+    
+    const payload = {
+        date: new Date().toISOString().split('T')[0],
+        action: document.getElementById('inv_type').value,
+        teacher_name: document.getElementById('teacher_name').value,
+        notes: document.getElementById('inv_notes').value
+    };
+
+    try {
+        const response = await fetch(`${API_BASE}/students/${studentId}/interventions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error("Failed to log intervention");
+        
+        alert("Intervention logged successfully! Baseline metrics captured.");
+        closeInterventionModal();
+        fetchStudentDetails(); // Refresh list
+    } catch (error) {
+        console.error("Error logging intervention:", error);
+        alert("Error saving intervention. Please try again.");
     }
 }
 
@@ -237,6 +336,60 @@ async function generateParentComm() {
         loading.classList.add('hidden');
         generateBtn.disabled = false;
         generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+async function fetchInterventions(id) {
+    const container = document.getElementById('interventions_container');
+    try {
+        const response = await fetch(`${API_BASE}/interventions/${id}`);
+        const data = await response.json();
+        
+        if (!data.interventions || data.interventions.length === 0) {
+            container.innerHTML = `<p class="text-gray-500 font-bold italic">No urgent interventions required for this risk level.</p>`;
+            return;
+        }
+
+        container.innerHTML = data.interventions.map(intv => `
+            <div class="flex items-start gap-4 p-4 rounded-xl bg-rose-50 border-l-4 border-rose-500 hover:shadow-md transition-all">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-black text-sm">
+                    ${intv.rank}
+                </div>
+                <div>
+                    <h3 class="font-black text-rose-950 uppercase text-sm">${intv.type}</h3>
+                    <p class="text-xs text-rose-800 font-bold leading-tight mt-1">${intv.reason}</p>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error("Error fetching interventions:", error);
+        container.innerHTML = `<p class="text-red-500 font-bold">Failed to load recommendations.</p>`;
+    }
+}
+
+async function fetchSchemes(id) {
+    const container = document.getElementById('schemes_container');
+    try {
+        const response = await fetch(`${API_BASE}/schemes/${id}`);
+        const data = await response.json();
+        
+        if (!data.eligible_schemes || data.eligible_schemes.length === 0) {
+            container.innerHTML = `<p class="text-gray-500 font-bold italic">No matching government schemes found.</p>`;
+            return;
+        }
+
+        container.innerHTML = data.eligible_schemes.map(scheme => `
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-100 hover:border-emerald-300 transition-all">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-emerald-600 font-black text-lg">🔗</span>
+                    <h3 class="font-black text-emerald-950 uppercase text-sm">${scheme.scheme}</h3>
+                </div>
+                <p class="text-xs text-emerald-800 font-bold leading-tight ml-7">${scheme.reason}</p>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error("Error fetching schemes:", error);
+        container.innerHTML = `<p class="text-red-500 font-bold">Failed to load scheme matches.</p>`;
     }
 }
 

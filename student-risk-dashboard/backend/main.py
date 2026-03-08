@@ -12,6 +12,8 @@ import uuid
 from models import Base, Student, Intervention
 from ml_model import model_instance
 from llm_service import generate_explanation, generate_parent_communication
+from intervention_engine import intervention_engine
+from scheme_matcher import scheme_matcher
 
 # DB Setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
@@ -155,7 +157,10 @@ def get_students(risk_level: str = None, grade_class: str = None, attendance: st
             students = [s for s in students if s.attendance_pct > 90]
             
     return students
-    
+
+def to_dict(obj):
+    return {c.name: getattr(obj, c.name) for c in obj.__table__.columns}
+
 @app.get("/api/students/{id}")
 def get_student_detail(id: int, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == id).first()
@@ -178,9 +183,46 @@ def get_student_detail(id: int, db: Session = Depends(get_db)):
         "benchmarks": [88, 74, 2.5, 85]
     }
 
+    # Refresh outcomes for pending interventions older than 30 days (Simulated: any intervention > 1 min for demo)
+    import datetime
+    for inv in interventions:
+        if not inv.is_evaluated and inv.date:
+            try:
+                # In real scenario, check date > 30 days
+                # For demo, if it exists, let's allow "evaluating" it
+                # Logic: Compare current student state to baseline
+                deltas = {
+                    "attendance": student.attendance_pct - (inv.baseline_attendance or 0),
+                    "score": student.latest_exam_score - (inv.baseline_score or 0),
+                    "risk": (inv.baseline_risk_score or 0) - student.risk_score # Lower is better
+                }
+                
+                # Simple heuristic: if 2/3 improved, then Improved
+                improvements = 0
+                if deltas['attendance'] > 0: improvements += 1
+                if deltas['score'] > 0: improvements += 1
+                if deltas['risk'] > 0: improvements += 1
+                
+                if improvements >= 2:
+                    inv.outcome_status = "Improved"
+                elif improvements == 0:
+                    inv.outcome_status = "Declined"
+                else:
+                    inv.outcome_status = "No Change"
+                
+                inv.outcome_attendance = student.attendance_pct
+                inv.outcome_score = student.latest_exam_score
+                inv.outcome_meal_pct = student.meal_participation_pct
+                inv.outcome_risk_score = student.risk_score
+                inv.is_evaluated = True
+                db.add(inv)
+            except Exception as e:
+                print(f"Eval error: {e}")
+    db.commit()
+
     return {
-        "student": student,
-        "interventions": interventions,
+        "student": to_dict(student),
+        "interventions": [to_dict(i) for i in interventions],
         "comparison": comparison
     }
 
@@ -207,17 +249,83 @@ def get_parent_communication(id: int, language: str = "English", db: Session = D
         "message": message
     }
 
+@app.get("/api/interventions/{id}")
+def get_interventions(id: int, db: Session = Depends(get_db)):
+    student = db.query(Student).filter(Student.id == id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+        
+    # Interventions are primarily for Medium/High risk
+    if student.risk_level == 'Low':
+        return {"student_id": student.student_id, "interventions": []}
+        
+    recs = intervention_engine.get_recommendations(student)
+    return {"student_id": student.student_id, "interventions": recs}
+
+@app.get("/api/schemes/{id}")
+def get_schemes(id: int, db: Session = Depends(get_db)):
+    student = db.query(Student).filter(Student.id == id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+        
+    eligible = scheme_matcher.get_eligible_schemes(student)
+    return {"student_id": student.student_id, "eligible_schemes": eligible}
+
 @app.post("/api/students/{id}/interventions")
 def log_intervention(id: int, payload: dict, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id == id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
         
-    inv = Intervention(student_id=id, date=payload.get("date"), action=payload.get("action"))
+    inv = Intervention(
+        student_id=id, 
+        date=payload.get("date"), 
+        action=payload.get("action"),
+        teacher_name=payload.get("teacher_name"),
+        notes=payload.get("notes"),
+        # Capture Baselines
+        baseline_attendance=student.attendance_pct,
+        baseline_score=student.latest_exam_score,
+        baseline_meal_pct=student.meal_participation_pct,
+        baseline_risk_score=student.risk_score,
+        outcome_status="Pending",
+        is_evaluated=False
+    )
     db.add(inv)
     db.commit()
     db.refresh(inv)
     return inv
+
+@app.get("/api/analytics/interventions")
+def get_intervention_analytics(db: Session = Depends(get_db)):
+    interventions = db.query(Intervention).filter(Intervention.is_evaluated == True).all()
+    if not interventions:
+        return {"message": "No evaluated data yet", "stats": []}
+    
+    # Group by action
+    stats = {}
+    for inv in interventions:
+        action = inv.action
+        if action not in stats:
+            stats[action] = {"count": 0, "improved": 0, "total_att_gain": 0}
+        
+        stats[action]["count"] += 1
+        if inv.outcome_status == "Improved":
+            stats[action]["improved"] += 1
+        
+        att_gain = (inv.outcome_attendance or 0) - (inv.baseline_attendance or 0)
+        stats[action]["total_att_gain"] += att_gain
+        
+    result = []
+    for action, data in stats.items():
+        result.append({
+            "intervention": action,
+            "success_rate": round((data["improved"] / data["count"]) * 100, 1),
+            "avg_attendance_improvement": round(data["total_att_gain"] / data["count"], 1),
+            "total_logs": data["count"]
+        })
+        
+    return sorted(result, key=lambda x: x['success_rate'], reverse=True)
 
 # Serve frontend static files
 app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")

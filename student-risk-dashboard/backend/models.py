@@ -31,3 +31,21 @@ class Intervention(Base):
     student_id = Column(Integer, ForeignKey('students.id'))
     date = Column(String)
     action = Column(String)
+    teacher_name = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+    
+    # Baseline indicators at time of intervention
+    baseline_attendance = Column(Float, nullable=True)
+    baseline_score = Column(Float, nullable=True)
+    baseline_meal_pct = Column(Float, nullable=True)
+    baseline_risk_score = Column(Float, nullable=True)
+    
+    # Outcome indicators (e.g. 30 days later)
+    outcome_attendance = Column(Float, nullable=True)
+    outcome_score = Column(Float, nullable=True)
+    outcome_meal_pct = Column(Float, nullable=True)
+    outcome_risk_score = Column(Float, nullable=True)
+    
+    # Status: Improved, No Change, Declined
+    outcome_status = Column(String, nullable=True, default="Pending")
+    is_evaluated = Column(Boolean, default=False)

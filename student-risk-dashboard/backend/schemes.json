@@ -1,0 +1,22 @@
+[
+ {
+   "scheme": "Free Bicycle Scheme",
+   "criteria": "distance_km > 3",
+   "description": "Student lives more than 3 km from school"
+ },
+ {
+   "scheme": "Scholarship Support",
+   "criteria": "latest_exam_score >= 60",
+   "description": "Student has achieved a score of 60 or above"
+ },
+ {
+   "scheme": "Mid-Day Meal Program",
+   "criteria": "midday_meal == True",
+   "description": "Student is enrolled in the midday meal program"
+ },
+ {
+   "scheme": "Transport Assistance",
+   "criteria": "distance_km > 5",
+   "description": "Distance from school is above 5 km"
+ }
+]

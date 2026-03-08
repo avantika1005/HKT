@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Home Visit",
+    "description": "Teacher visits the student's home to discuss attendance and barriers to school with parents.",
+    "evidence_source": "Education Research Study (Attendance & Retention)",
+    "addresses": ["Low attendance", "Family disengagement"],
+    "expected_impact": "10-15% Improvement in attendance within 30 days"
+  },
+  {
+    "name": "Counselling Session",
+    "description": "One-on-one session with a school counsellor or mentor to address academic or personal issues.",
+    "evidence_source": "School Mental Health Framework",
+    "addresses": ["Academic decline", "Emotional stress", "Poor exam scores"],
+    "expected_impact": "Stabilization of grades and improved classroom focus"
+  },
+  {
+    "name": "Scholarship Application",
+    "description": "Assisting the family in applying for available government or community scholarships.",
+    "evidence_source": "Financial Barriers in Education Report",
+    "addresses": ["Economic hardship", "Distance from school"],
+    "expected_impact": "Reduced financial stress and improved long-term persistence"
+  },
+  {
+    "name": "Peer Buddy Assignment",
+    "description": "Pairing the student with a successful 'Successful Student' mentor for academic and social support.",
+    "evidence_source": "School Retention & Peer Support Programs",
+    "addresses": ["Student disengagement", "Social isolation", "Sibling dropout history"],
+    "expected_impact": "Improvement in social belonging and mid-day meal participation"
+  },
+  {
+    "name": "Parent Meeting",
+    "description": "Formal meeting at school to discuss student progress and specific risk factors.",
+    "evidence_source": "Parent-School Engagement Best Practices",
+    "addresses": ["Unexpected grade drop", "Low meal participation"],
+    "expected_impact": "Increased parental awareness and active monitoring at home"
+  },
+  {
+    "name": "Academic Support Program",
+    "description": "Extra remedial classes or tutoring after school hours.",
+    "evidence_source": "Remedial Education Strategies",
+    "addresses": ["Failing exam scores", "Low academic performance"],
+    "expected_impact": "8-12% Improvement in next exam score"
+  }
+]
