@@ -35,6 +35,6 @@ The **Student Risk Dashboard** is an AI-powered early warning system developed t
 * 💻 **Frontend:** HTML, CSS, Tailwind CSS, JavaScript
 * 📊 **Data Visualization:** Chart.js
 * 🧠 **AI Logic:** Risk scoring model with factor explanation
-* 🛠 **Tools:** GitHub, Antigravity, ChatGPT
+* 🛠 **Tools:** Antigravity, ChatGPT
 
 
