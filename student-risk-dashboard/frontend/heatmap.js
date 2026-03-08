@@ -223,10 +223,11 @@ function applyFilters() {
 
     renderMarkers(filtered);
     
-    // Fit bounds if we have points, else ignore
-    if (filtered.length > 0) {
-        const lats = filtered.map(f => f.lat);
-        const lngs = filtered.map(f => f.lng);
+    // Fit bounds if we have points with valid coordinates
+    const validPoints = filtered.filter(f => f.lat != null && f.lng != null && !isNaN(f.lat) && !isNaN(f.lng));
+    if (validPoints.length > 0) {
+        const lats = validPoints.map(f => f.lat);
+        const lngs = validPoints.map(f => f.lng);
         const minLat = Math.min(...lats);
         const maxLat = Math.max(...lats);
         const minLng = Math.min(...lngs);

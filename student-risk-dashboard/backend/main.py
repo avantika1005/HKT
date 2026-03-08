@@ -359,7 +359,19 @@ def get_district_heatmap(db: Session = Depends(get_db)):
         "Salem Govt School": {"lat": 11.6643, "lng": 78.1460},     # Salem
         "Trichy Model School": {"lat": 10.7905, "lng": 78.7047},   # Tiruchirappalli
         "Tirunelveli High School": {"lat": 8.7139, "lng": 77.7567},# Tirunelveli
-        "Vellore Heritage School": {"lat": 12.9165, "lng": 79.1325} # Vellore
+        "Vellore Heritage School": {"lat": 12.9165, "lng": 79.1325}, # Vellore
+        
+        # New prominent locations
+        "Nilgiris Mountain School": {"lat": 11.4118, "lng": 76.6953}, # Ooty / Nilgiris
+        "Thanjavur Delta Academy": {"lat": 10.7870, "lng": 79.1378}, # Thanjavur
+        "Kanyakumari Coastal Govt": {"lat": 8.0883, "lng": 77.5385}, # Kanyakumari
+        "Erode Textile City School": {"lat": 11.3410, "lng": 77.7172}, # Erode
+        "Thoothukudi Port Academy": {"lat": 8.7642, "lng": 78.1348}, # Thoothukudi
+        "Dindigul Fort High": {"lat": 10.3624, "lng": 77.9695}, # Dindigul
+        "Tiruvannamalai Heritage": {"lat": 12.2253, "lng": 79.0747}, # Tiruvannamalai
+        "Cuddalore Coast School": {"lat": 11.7480, "lng": 79.7714}, # Cuddalore
+        "Karur Kongu Academy": {"lat": 10.9601, "lng": 78.0766}, # Karur
+        "Krishnagiri Border School": {"lat": 12.5186, "lng": 78.2137} # Krishnagiri
     }
     
     school_metrics = {}
@@ -387,9 +399,9 @@ def get_district_heatmap(db: Session = Depends(get_db)):
             
         metrics = school_metrics[s_name]
         metrics["total_students"] += 1
-        metrics["total_risk_score"] += s.risk_score
-        metrics["total_attendance"] += s.attendance_pct
-        metrics["total_exam"] += s.latest_exam_score
+        metrics["total_risk_score"] += (s.risk_score or 0)
+        metrics["total_attendance"] += (s.attendance_pct or 0)
+        metrics["total_exam"] += (s.latest_exam_score or 0)
         
         if s.risk_level == "High":
             metrics["high_risk_count"] += 1
