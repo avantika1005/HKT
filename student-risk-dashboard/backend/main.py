@@ -10,11 +10,11 @@ import os
 import uuid
 import datetime
 
-from models import Base, Student, Intervention
-from ml_model import model_instance
-from llm_service import generate_explanation, generate_parent_communication
-from intervention_engine import intervention_engine
-from scheme_matcher import scheme_matcher
+from .models import Base, Student, Intervention
+from .ml_model import model_instance
+from .llm_service import generate_explanation, generate_parent_communication
+from .intervention_engine import intervention_engine
+from .scheme_matcher import scheme_matcher
 
 # DB Setup
 if os.environ.get("VERCEL"):
