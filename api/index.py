@@ -6,7 +6,4 @@ backend_path = os.path.join(os.path.dirname(__file__), "..", "student-risk-dashb
 sys.path.append(backend_path)
 
 # Import the FastAPI app from main.py
-from main import app as application
-
-# This exposes the FastAPI app to Vercel
-app = application
+from main import app
