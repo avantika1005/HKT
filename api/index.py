@@ -9,4 +9,4 @@ sys.path.append(backend_path)
 from main import app as application
 
 # This exposes the FastAPI app to Vercel
-app = application
+
