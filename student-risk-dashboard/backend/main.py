@@ -79,7 +79,15 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
                      
     if not all(col in df.columns for col in required_cols):
         raise HTTPException(status_code=400, detail="Missing required columns in CSV")
-        
+def parse_bool(value):
+    val = str(value).strip().lower()
+    if val in ['true', 'yes', '1']:
+        return True
+    elif val in ['false', 'no', '0']:
+        return False
+    else:
+        return False
+    
     for index, row in df.iterrows():
         school_name = row.get('School Name', 'Kanchipuram Govt Model School')
         block_name = row.get('Block Name', 'Kanchipuram Central')
@@ -90,9 +98,9 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
             'latest_exam_score': float(row['Latest Exam Score']),
             'previous_exam_score': float(row['Previous Exam Score']),
             'distance_km': float(row['Distance from School (km)']),
-            'midday_meal': str(row['Midday Meal Participation (Yes/No)']).strip().lower() == 'yes',
+            'midday_meal': parse_bool(row['Midday Meal Participation (Yes/No)']),
             'meal_participation_pct': float(row['Midday Meal Participation Rate (%)']),
-            'sibling_dropout': str(row['Sibling Dropout History (Yes/No)']).strip().lower() == 'yes'
+            'sibling_dropout': parse_bool(row['Sibling Dropout History (Yes/No)'])
         }
         
         # ML Prediction
