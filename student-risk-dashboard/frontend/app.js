@@ -25,8 +25,8 @@ function uploadData() {
     })
     .then(res => {
         if (res.ok) {
-            alert("Student data uploaded and processed successfully!");
-            location.reload();
+            alert("Student data uploaded and processed successfully! The dashboard will refresh in 2 seconds.");
+            setTimeout(() => location.reload(), 2000);
         } else {
             return res.json().then(data => {
                 alert("Upload failed: " + (data.detail || "Unknown error"));
@@ -254,29 +254,6 @@ function init() {
     loadRiskStats();
     loadAnalyticsPreview();
     loadGeneralInterventions();
-    
-    const buttons = document.querySelectorAll("button");
-    buttons.forEach(btn => {
-        const text = btn.innerText.trim();
-        if (text.includes("UPLOAD DATA") || btn.id === "uploadDataBtn") {
-            btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                uploadData();
-            });
-        }
-        if (text.includes("Parent Meeting")) {
-             btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                generateMessage();
-            });
-        }
-        if (text.includes("Scholarship Portal") || text.includes("Scheme")) {
-             btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                checkSchemes();
-            });
-        }
-    });
 }
 
 if (document.readyState === "loading") {
