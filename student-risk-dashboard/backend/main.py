@@ -9,6 +9,7 @@ import pandas as pd
 import os
 import uuid
 import datetime
+import shutil
 
 from models import Base, Student, Intervention
 from ml_model import model_instance
@@ -17,8 +18,20 @@ from intervention_engine import intervention_engine
 from scheme_matcher import scheme_matcher
 
 # DB Setup
+# DB Setup
 if os.environ.get("VERCEL"):
+    # Vercel's /tmp is writable. We copy our persistent seeded DB there if it's missing.
+    # Note: Changes made during the session will still be lost on cold start.
     SQLALCHEMY_DATABASE_URL = "sqlite:////tmp/sql_app.db"
+    PERSISTENT_DB = os.path.join(os.path.dirname(__file__), "sql_app.db")
+    TEMP_DB = "/tmp/sql_app.db"
+    
+    if os.path.exists(PERSISTENT_DB) and not os.path.exists(TEMP_DB):
+        try:
+            shutil.copy2(PERSISTENT_DB, TEMP_DB)
+            print("Successfully copied persistent DB to /tmp")
+        except Exception as e:
+            print(f"Error copying DB to /tmp: {e}")
 else:
     SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 

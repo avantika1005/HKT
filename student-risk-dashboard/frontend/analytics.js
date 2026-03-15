@@ -1,33 +1,36 @@
 const API_BASE = "/api";
 
 async function fetchAnalytics() {
+    console.log("Fetching analytics data...");
     try {
         const response = await fetch(`${API_BASE}/analytics/interventions`);
-        if (!response.ok) throw new Error("Failed to fetch analytics");
+        if (!response.ok) throw new Error(`Failed to fetch analytics: ${response.status}`);
         
         const data = await response.json();
+        console.log("Analytics data received:", data);
         
-        // Also fetch total students count
-        try {
-            const studentResp = await fetch(`${API_BASE}/students`);
-            if (studentResp.ok) {
-                const studentData = await studentResp.json();
-                document.getElementById('total_students').innerText = studentData.length;
-            }
-        } catch (e) {
-            console.error("Failed to fetch students count:", e);
-        }
+        // Non-blocking fetch for total students count
+        fetch(`${API_BASE}/students`)
+            .then(res => res.json())
+            .then(studentData => {
+                console.log("Total students fetched:", studentData.length);
+                const countEl = document.getElementById('total_students');
+                if (countEl) countEl.innerText = studentData.length;
+            })
+            .catch(e => console.error("Failed to fetch students count:", e));
 
         if (!data || data.message === "No evaluated data yet" || (Array.isArray(data) && data.length === 0)) {
+            console.warn("No evaluated data found in response.");
             showEmptyState();
             return;
         }
 
         renderAnalytics(data);
     } catch (error) {
-        console.error("Error loading analytics:", error);
+        console.error("Critical error loading analytics:", error);
         document.getElementById('loadingState').innerHTML = `
-            <p class="text-red-600 text-xl font-black">ERROR LOADING ANALYTICS DATA. PLEASE TRY AGAIN LATER.</p>
+            <p class="text-red-600 text-xl font-black uppercase">Error Loading Data</p>
+            <p class="text-gray-500 font-bold mt-2">${error.message}. Please check if the server is running.</p>
         `;
     }
 }
