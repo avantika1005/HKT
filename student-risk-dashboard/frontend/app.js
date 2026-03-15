@@ -25,8 +25,8 @@ function uploadData() {
     })
     .then(res => {
         if (res.ok) {
-            alert("Student data uploaded and processed successfully! The dashboard will refresh in 2 seconds.");
-            setTimeout(() => location.reload(), 2000);
+            alert("Student data uploaded and processed successfully! Redirecting to student list...");
+            setTimeout(() => window.location.href = 'students.html', 2000);
         } else {
             return res.json().then(data => {
                 alert("Upload failed: " + (data.detail || "Unknown error"));
