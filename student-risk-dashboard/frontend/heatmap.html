@@ -14,6 +14,27 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script src="heatmap.js" defer></script>
+<style>
+  /* Remove the black focus outline Leaflet adds to circle markers on click */
+  .leaflet-interactive:focus {
+    outline: none !important;
+  }
+
+  /* Custom Attention-Grabbing Popup */
+  .custom-leaflet-popup .leaflet-popup-content-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .custom-leaflet-popup .leaflet-popup-content {
+    margin: 0 !important;
+    width: auto !important;
+    min-width: 200px;
+  }
+  .custom-leaflet-popup .leaflet-popup-tip {
+    background: #312e81; /* indigo-900 to match the popup gradient */
+  }
+</style>
 </head>
 <body class="bg-gradient-to-b from-purple-900 to-purple-300 min-h-screen text-white font-sans">
 

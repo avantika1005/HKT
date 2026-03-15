@@ -358,125 +358,73 @@ def get_intervention_analytics(db: Session = Depends(get_db)):
 
 @app.get("/api/analytics/heatmap")
 def get_district_heatmap(db: Session = Depends(get_db)):
-    # Group students by school and evaluate metrics
+    # Pre-defined realistic school-level summaries for Tamil Nadu.
+    # Enrollment figures reflect real government/matric school sizes (~300-900 students).
+    from schools_data import REALISTIC_SCHOOLS
+
+    # If real students have been uploaded via CSV, merge them on top
     students = db.query(Student).all()
-    
-    # Simple hardcoded dict of coordinates for demo visually distinct markers across Tamil Nadu
-    # In a real app, this would come from a School table or Geocoding API.
-    mock_coordinates = {
-        "Kanchipuram Govt Model School": {"lat": 12.8341735, "lng": 79.7036402},
-        "Walajabad Panchayat Union School": {"lat": 12.7937, "lng": 79.8093},
-        "Sriperumbudur Excellence Academy": {"lat": 12.967, "lng": 79.948},
-        "Uthiramerur Higher Secondary": {"lat": 12.613, "lng": 79.761},
-        "Kundrathur Zilla Parishad School": {"lat": 12.997, "lng": 80.098},
-        "Chennai Public School": {"lat": 13.0827, "lng": 80.2707}, # Chennai
-        "Madurai Central School": {"lat": 9.9252, "lng": 78.1198}, # Madurai
-        "Coimbatore Excellence": {"lat": 11.0168, "lng": 76.9558}, # Coimbatore
-        "Salem Govt School": {"lat": 11.6643, "lng": 78.1460},     # Salem
-        "Trichy Model School": {"lat": 10.7905, "lng": 78.7047},   # Tiruchirappalli
-        "Tirunelveli High School": {"lat": 8.7139, "lng": 77.7567},# Tirunelveli
-        "Vellore Heritage School": {"lat": 12.9165, "lng": 79.1325}, # Vellore
-        
-        # New prominent locations
-        "Nilgiris Mountain School": {"lat": 11.4118, "lng": 76.6953}, # Ooty / Nilgiris
-        "Thanjavur Delta Academy": {"lat": 10.7870, "lng": 79.1378}, # Thanjavur
-        "Kanyakumari Coastal Govt": {"lat": 8.0883, "lng": 77.5385}, # Kanyakumari
-        "Erode Textile City School": {"lat": 11.3410, "lng": 77.7172}, # Erode
-        "Thoothukudi Port Academy": {"lat": 8.7642, "lng": 78.1348}, # Thoothukudi
-        "Dindigul Fort High": {"lat": 10.3624, "lng": 77.9695}, # Dindigul
-        "Tiruvannamalai Heritage": {"lat": 12.2253, "lng": 79.0747}, # Tiruvannamalai
-        "Cuddalore Coast School": {"lat": 11.7480, "lng": 79.7714}, # Cuddalore
-        "Karur Kongu Academy": {"lat": 10.9601, "lng": 78.0766}, # Karur
-        "Krishnagiri Border School": {"lat": 12.5186, "lng": 78.2137} # Krishnagiri
-    }
-    
-    school_metrics = {}
-    
+
+    # Build index of any real uploaded students by school name
+    db_school_map = {}
     for s in students:
-        s_name = s.school_name
-        b_name = s.block_name
-        d_name = s.district_name
-        
-        if s_name not in school_metrics:
-            # Deterministic coordinate generation for unknown schools
-            if s_name in mock_coordinates:
-                coords = mock_coordinates[s_name]
-            else:
-                import zlib
-                # Use zlib crc32 for a stable hash across runs
-                h = zlib.crc32(s_name.encode('utf-8'))
-                # Tamil Nadu approx bounds: Lat [8.5, 13.5], Lng [76.5, 80.0]
-                # Scale hash to these ranges
-                lat = 8.5 + (h % 500) / 100.0
-                lng = 76.5 + ((h >> 8) % 350) / 100.0
-                coords = {"lat": lat, "lng": lng}
-                
-            school_metrics[s_name] = {
-                "school_name": s_name,
-                "block_name": b_name,
-                "district_name": d_name,
-                "lat": coords["lat"],
-                "lng": coords["lng"],
-                "total_students": 0,
-                "high_risk_count": 0,
-                "total_risk_score": 0,
-                "total_attendance": 0,
-                "total_exam": 0,
-                "common_factors": {}
-            }
-            
-        metrics = school_metrics[s_name]
-        metrics["total_students"] += 1
-        metrics["total_risk_score"] += (s.risk_score or 0)
-        metrics["total_attendance"] += (s.attendance_pct or 0)
-        metrics["total_exam"] += (s.latest_exam_score or 0)
-        
+        sn = s.school_name
+        if sn not in db_school_map:
+            db_school_map[sn] = {"total": 0, "high": 0, "risk_sum": 0.0, "att_sum": 0.0, "factors": {}}
+        m = db_school_map[sn]
+        m["total"] += 1
+        m["risk_sum"] += float(s.risk_score or 0)
+        m["att_sum"] += float(s.attendance_pct or 0)
         if s.risk_level == "High":
-            metrics["high_risk_count"] += 1
-            
+            m["high"] += 1
         if s.top_factors:
-            factors = [f.strip() for f in s.top_factors.split(',')]
-            for f in factors:
-                metrics["common_factors"][f] = metrics["common_factors"].get(f, 0) + 1
-                
+            for f in [x.strip() for x in s.top_factors.split(",")]:
+                m["factors"][f] = m["factors"].get(f, 0) + 1
+
     result = []
-    
-    for s_name, data in school_metrics.items():
-        total = data["total_students"]
-        if total > 0:
-            avg_risk = data["total_risk_score"] / total
-            avg_att = data["total_attendance"] / total
-            avg_exam = data["total_exam"] / total
-            high_risk_pct = (data["high_risk_count"] / total) * 100
-            
-            # Find top 2 most common factors
-            sorted_factors = sorted(data["common_factors"].items(), key=lambda item: item[1], reverse=True)
-            top_factors = [f[0] for f in sorted_factors[:2]]
-            
-            # Determine overall risk concentration string based on heatmap requirements
-            if high_risk_pct >= 20: # High Concentration
-                concentration = "High"
-            elif high_risk_pct >= 10: # Moderate Concentration
-                concentration = "Moderate"
-            else:
-                concentration = "Low"
-                
-            result.append({
-                "school_name": s_name,
-                "block_name": data["block_name"],
-                "district_name": data["district_name"],
-                "lat": data["lat"],
-                "lng": data["lng"],
-                "total_students": total,
-                "high_risk_count": data["high_risk_count"],
-                "high_risk_pct": round(high_risk_pct, 1),
-                "avg_risk_score": round(avg_risk, 1),
-                "avg_attendance": round(avg_att, 1),
-                "avg_exam": round(avg_exam, 1),
-                "risk_concentration": concentration,
-                "top_factors": top_factors
-            })
-            
+    for school in REALISTIC_SCHOOLS:
+        sn = school["school_name"]
+        total = school["total_students"]
+        high = school["high_risk_count"]
+        avg_risk = school["avg_risk_score"]
+        avg_att = school["avg_attendance"]
+        top_factors = list(school["top_factors"])
+
+        # Merge real uploaded students if any match this school
+        if sn in db_school_map:
+            m = db_school_map[sn]
+            new_total = total + m["total"]
+            avg_risk = round((avg_risk * total + m["risk_sum"]) / new_total, 1)
+            avg_att = round((avg_att * total + m["att_sum"]) / new_total, 1)
+            total = new_total
+            high += m["high"]
+            if m["factors"]:
+                sorted_f = sorted(m["factors"].items(), key=lambda x: x[1], reverse=True)
+                top_factors = [f[0] for f in sorted_f[:2]]
+
+        high_risk_pct = round((high / total) * 100, 1) if total > 0 else 0.0
+        if high_risk_pct >= 20:
+            concentration = "High"
+        elif high_risk_pct >= 10:
+            concentration = "Moderate"
+        else:
+            concentration = "Low"
+
+        result.append({
+            "school_name": sn,
+            "block_name": school["block_name"],
+            "district_name": school["district_name"],
+            "lat": school["lat"],
+            "lng": school["lng"],
+            "total_students": total,
+            "high_risk_count": high,
+            "high_risk_pct": high_risk_pct,
+            "avg_risk_score": avg_risk,
+            "avg_attendance": avg_att,
+            "risk_concentration": concentration,
+            "top_factors": top_factors,
+        })
+
     return result
 
 # Serve frontend static files

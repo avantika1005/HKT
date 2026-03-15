@@ -18,21 +18,8 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 FIRST_NAMES = ["Arun", "Priya", "Vijay", "Ananya", "Karthik", "Meera", "Rahul", "Sita", "Deepak", "Jasmin", "Sanjay", "Aavya", "Aditya", "Ishani", "Kavya", "Mohan", "Nisha", "Rohan", "Sneha", "Vikram", "Abhishek", "Divya", "Ganesh", "Jyoti", "Kiran", "Madhav", "Nehal", "Pranav", "Riya", "Sahil"]
 LAST_NAMES = ["Kumar", "Sharma", "Singh", "Das", "R", "Iyer", "Bose", "Lakshmi", "Raj", "Kaur", "Gupta", "Verma", "Reddy", "Nair", "Patel", "Mehta", "Joshi", "Chopra", "Malhotra", "Kapoor"]
-TOWNS = ["Kanchipuram", "Sriperumbudur", "Walajabad", "Uthiramerur", "Kundrathur", "Madurantakam", "Chengalpattu", "Tambaram", "Pallavaram", "Ambattur", "Avadi", "Ponneri", "Gummidipoondi", "Tiruvallur", "Poonamallee", "Tiruttani", "Arakkonam", "Vellore", "Ranipet", "Arcot", "Gudiyatham", "Ambur", "Vaniyambadi", "Tirupathur", "Krishnagiri", "Hosur", "Dharmapuri", "Tiruvannamalai", "Polur", "Arani", "Cheyyar", "Vandavasi", "Villupuram", "Tindivanam", "Gingee", "Kallakurichi", "Ulundurpet", "Salem", "Attur", "Mettur", "Namakkal", "Rasipuram", "Erode", "Bhavani", "Perundurai", "Tiruppur", "Avinashi", "Coimbatore", "Pollachi", "Mettu-palayam", "Udagamandalam", "Coonoor", "Kotagiri", "Gudalur", "Thiruchirappalli", "Srirangam", "Manapparai", "Thuraiyur", "Musiri", "Karur", "Kulithalai", "Perambalur", "Ariyalur", "Jayankondam", "Cuddalore", "Chidambaram", "Panruti", "Virudhachalam", "Neyveli", "Nagapattinam", "Mayiladuthurai", "Sirkazhi", "Tharangambadi", "Tiruvarur", "Mannargudi", "Thiruthuraipoondi", "Thanjavur", "Kumbakonam", "Pattukkottai", "Orathanadu", "Pudukkottai", "Aranthangi", "Madurai", "Melur", "Thirumangalam", "Usilampatti", "Dindigul", "Palani", "Oddanchatram", "Kodaikanal", "Theni", "Periyakulam", "Bodinayakanur", "Cumbum", "Virudhunagar", "Sivakasi", "Rajapalayam", "Aruppukkottai", "Sivagangai", "Karaikudi", "Devakottai", "Ramanathapuram", "Paramakudi", "Rameswaram", "Tirunelveli", "Palayamkottai", "Ambasamudram", "Tenkasi", "Sankarankovil", "Tuticorin", "Thoothukudi", "Kovilpatti", "Tiruchendur", "Kanyakumari", "Nagercoil", "Padmanabhapuram", "Kuzhithurai"]
-SCHOOL_SUFFIXES = ["Govt Model School", "Panchayat Union School", "Excellence Academy", "Higher Secondary", "Matric Hr.Sec.School", "Zilla Parishad High School", "Christian Mission School", "Vidyalayam", "Public School", "Aided High School"]
-
-# Generate 125 unique schools
-SCHOOLS = []
-for town in TOWNS:
-    suffix = random.choice(SCHOOL_SUFFIXES)
-    SCHOOLS.append(f"{town} {suffix}")
-# Ensure at least 125 by adding more combinations if needed
-while len(SCHOOLS) < 125:
-    town = random.choice(TOWNS)
-    suffix = random.choice(SCHOOL_SUFFIXES)
-    name = f"{town} {suffix}"
-    if name not in SCHOOLS:
-        SCHOOLS.append(name)
+from schools_data import REALISTIC_SCHOOLS
+SCHOOL_LIST = REALISTIC_SCHOOLS
 
 GRADES = ["8th", "9th", "10th", "11th", "12th"]
 FACTORS_LIST = ["Attendance", "Latest Exam Score", "Distance", "Midday Meal", "Sibling Dropout", "Behavioral", "Financial"]
@@ -59,11 +46,19 @@ def seed():
     db.query(Student).delete()
     db.commit()
     
-    print(f"Generating 500 student records across {len(SCHOOLS)} schools...")
-    for i in range(1, 501):
+    num_students = 1000
+    print(f"Generating {num_students} student records across {len(SCHOOL_LIST)} schools...")
+    
+    for i in range(1, num_students + 1):
         s_id = f"STU{1000 + i}"
         name = f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}"
-        school = random.choice(SCHOOLS)
+        
+        # Pick a school from the fixed list to ensure high enrollment per school
+        school_info = random.choice(SCHOOL_LIST)
+        school = school_info["school_name"]
+        district = school_info["district_name"]
+        block = school_info["block_name"]
+        
         grade = random.choice(GRADES)
         
         # Determine risk level based on some randomized logic
@@ -107,8 +102,8 @@ def seed():
             student_id=s_id,
             name=name,
             school_name=school,
-            block_name="Kanchipuram Central",
-            district_name="Kanchipuram",
+            block_name=block,
+            district_name=district,
             grade_class=grade,
             attendance_pct=att,
             latest_exam_score=score,
@@ -125,14 +120,16 @@ def seed():
         db.commit()
         db.refresh(student)
 
+
+
         # Generate interventions for some students (higher probability for High/Medium risk)
-        inv_prob = 0.9 if risk == "High" else (0.6 if risk == "Medium" else 0.2)
+        inv_prob = 0.9 if risk == "High" else (0.75 if risk == "Medium" else 0.35)
         
         if random.random() < inv_prob:
-            num_inv = random.randint(1, 5)
+            num_inv = random.randint(1, 7)
             for j in range(num_inv):
                 action = random.choice(ACTIONS)
-                is_eval = random.choice([True, True, False]) # 66% chance of being evaluated
+                is_eval = random.random() < 0.7 # 70% chance of being evaluated
                 
                 baseline_att = round(random.uniform(50, 85), 1)
                 baseline_score = round(random.uniform(30, 75), 1)
@@ -169,9 +166,13 @@ def seed():
                     is_evaluated=is_eval
                 )
                 db.add(inv)
+        
+        if i % 100 == 0:
+            db.commit()
+            print(f"Processed {i} students...")
     
     db.commit()
-    print(f"Database successfully seeded with 120 students and varied intervention histories.")
+    print(f"Database successfully seeded with {num_students} students across {len(SCHOOL_LIST)} schools.")
     db.close()
 
 if __name__ == "__main__":

@@ -1,6 +1,9 @@
 const API_BASE = "/api";
 
 let currentStudents = [];
+let filteredStudents = [];
+let currentPage = 1;
+const ITEMS_PER_PAGE = 250;
 let sortConfig = { key: null, direction: 'asc' };
 
 async function fetchStudents() {
@@ -10,8 +13,9 @@ async function fetchStudents() {
         if (!response.ok) throw new Error("Failed to fetch students");
         
         currentStudents = await response.json();
+        filteredStudents = [...currentStudents];
         console.log("Received students:", currentStudents.length);
-        renderStudents(currentStudents);
+        renderStudents();
     } catch (error) {
         console.error("Error fetching students:", error);
         document.getElementById('studentTableBody').innerHTML = `
@@ -72,14 +76,16 @@ function sortStudents(key, direction) {
         return 0;
     });
 
-    renderStudents(sortedData);
+    filteredStudents = sortedData;
+    currentPage = 1;
+    renderStudents();
 }
 
-function renderStudents(students) {
-    console.log("Rendering", students.length, "students");
+function renderStudents() {
+    console.log("Rendering block of students");
     const tableBody = document.getElementById('studentTableBody');
     
-    if (!students || students.length === 0) {
+    if (!filteredStudents || filteredStudents.length === 0) {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" class="py-12 text-center text-gray-400 font-bold italic">
@@ -90,7 +96,11 @@ function renderStudents(students) {
         return;
     }
 
-    tableBody.innerHTML = students.map(student => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginatedStudents = filteredStudents.slice(startIndex, endIndex);
+
+    tableBody.innerHTML = paginatedStudents.map(student => {
         let riskClass = "bg-green-100 text-green-700 border-green-200";
         const level = (student.risk_level || 'N/A').toUpperCase();
         
@@ -126,6 +136,52 @@ function renderStudents(students) {
             </tr>
         `;
     }).join('');
+
+    renderPagination();
+}
+
+window.changePage = function(newPage) {
+    currentPage = newPage;
+    renderStudents();
+};
+
+window.goToPage = function(value, maxPage) {
+    let page = parseInt(value);
+    if (isNaN(page)) {
+        renderPagination(); // reset to current page in input
+        return;
+    }
+    if (page < 1) page = 1;
+    if (page > maxPage) page = maxPage;
+    changePage(page);
+};
+
+function renderPagination() {
+    const totalPages = Math.ceil(filteredStudents.length / ITEMS_PER_PAGE);
+    const container = document.getElementById('paginationControls');
+    if (!container) return;
+    
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    const prevDisabled = currentPage === 1;
+    const nextDisabled = currentPage === totalPages;
+    
+    container.innerHTML = `
+        <div class="flex items-center gap-2">
+            <button onclick="changePage(${currentPage - 1})" class="px-4 py-2 rounded-xl font-bold transition-all text-sm ${prevDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-purple-100 text-purple-900 hover:bg-purple-200'}" ${prevDisabled ? 'disabled' : ''}>Previous</button>
+            <span class="text-sm font-black text-purple-950 px-4 flex items-center gap-2">
+                Page 
+                <input type="number" min="1" max="${totalPages}" value="${currentPage}" 
+                       onchange="goToPage(this.value, ${totalPages})"
+                       class="w-16 px-1 py-1 text-center border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white shadow-sm">
+                of ${totalPages}
+            </span>
+            <button onclick="changePage(${currentPage + 1})" class="px-4 py-2 rounded-xl font-bold transition-all text-sm ${nextDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-purple-100 text-purple-900 hover:bg-purple-200'}" ${nextDisabled ? 'disabled' : ''}>Next</button>
+        </div>
+    `;
 }
 
 document.addEventListener("DOMContentLoaded", fetchStudents);

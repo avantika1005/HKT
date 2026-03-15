@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="index.css">
 <script src="auth.js"></script>
-<script src="analytics.js" defer></script>
+<script src="analytics.js?v=2" defer></script>
 </head>
 <body class="bg-gradient-to-b from-purple-900 to-purple-300 min-h-screen text-white font-sans">
 
@@ -37,11 +37,16 @@
 
     <div id="analyticsContent" class="hidden space-y-10">
         <!-- TOP ROW STATS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-2xl shadow-xl border-l-[12px] border-emerald-500 text-black">
                 <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Highest Success Rate</p>
                 <h3 id="top_intervention" class="text-2xl font-black text-indigo-950 mt-1 uppercase">-</h3>
                 <p id="top_rate" class="text-4xl font-black text-emerald-600 mt-2">0%</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-l-[12px] border-blue-500 text-black">
+                <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Students</p>
+                <h3 class="text-2xl font-black text-indigo-950 mt-1 uppercase">Enrolled</h3>
+                <p id="total_students" class="text-4xl font-black text-blue-600 mt-2">0</p>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-xl border-l-[12px] border-indigo-500 text-black">
                 <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Evaluated Actions</p>

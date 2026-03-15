@@ -86,17 +86,17 @@ Logout
 
 <div class="bg-gradient-to-r from-red-600 to-red-500 p-4 rounded-xl shadow-lg border-l-8 border-red-900">
 <h2 class="text-xs font-black uppercase tracking-widest text-white">High Risk</h2>
-<p class="text-4xl font-black mt-1">5</p>
+<p id="topHighRisk" class="text-4xl font-black mt-1">--</p>
 </div>
 
 <div class="bg-gradient-to-r from-yellow-500 to-yellow-400 p-4 rounded-xl shadow-lg border-l-8 border-yellow-700 text-black">
 <h2 class="text-xs font-black uppercase tracking-widest">Medium Risk</h2>
-<p class="text-4xl font-black mt-1">12</p>
+<p id="topMedRisk" class="text-4xl font-black mt-1">--</p>
 </div>
 
 <div class="bg-gradient-to-r from-green-600 to-green-500 p-4 rounded-xl shadow-lg border-l-8 border-green-900 text-white">
 <h2 class="text-xs font-black uppercase tracking-widest">Low Risk</h2>
-<p class="text-4xl font-black mt-1">18</p>
+<p id="topLowRisk" class="text-4xl font-black mt-1">--</p>
 </div>
 
 </div>
@@ -187,7 +187,7 @@ Recent Alerts
 <h2 class="text-xl font-black mb-4 uppercase">Intervention Playbook</h2>
 
 <div id="playbookContainer" class="space-y-3">
-    <!-- populated by app.js -->
+    <!-- populated by app.js?v=2 -->
     <p class="text-sm italic text-purple-200">Loading interventions…</p>
 </div>
 
@@ -314,7 +314,7 @@ window.alert = function(message) {
 
 /* REDEFINE checkSchemes to prevent double triggers and use modal */
 window.checkSchemes = function() {
-    // No-op to prevent app.js default alert
+    // No-op to prevent app.js?v=2 default alert
     return false;
 };
 
@@ -353,10 +353,10 @@ function openScheme(type){
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure checkSchemes is overridden even after app.js loads
+    // Ensure checkSchemes is overridden even after app.js?v=2 loads
     window.checkSchemes = function() { /* stay silent */ };
 });
 </script>
-<script src="app.js"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

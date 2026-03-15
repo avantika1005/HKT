@@ -79,6 +79,14 @@ async function loadRiskStats() {
         if (mEl) mEl.innerText = Math.round(med);
         if (lEl) lEl.innerText = Math.round(low);
 
+        const topHR = document.getElementById("topHighRisk");
+        const topMR = document.getElementById("topMedRisk");
+        const topLR = document.getElementById("topLowRisk");
+
+        if (topHR) topHR.innerText = Math.round(high);
+        if (topMR) topMR.innerText = Math.round(med);
+        if (topLR) topLR.innerText = Math.round(low);
+
         updateRiskChart(high, med, low);
         updatePlaybookCounts(high, med, low);
         updateAlerts(students);

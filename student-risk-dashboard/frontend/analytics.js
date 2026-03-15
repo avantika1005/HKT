@@ -7,6 +7,17 @@ async function fetchAnalytics() {
         
         const data = await response.json();
         
+        // Also fetch total students count
+        try {
+            const studentResp = await fetch(`${API_BASE}/students`);
+            if (studentResp.ok) {
+                const studentData = await studentResp.json();
+                document.getElementById('total_students').innerText = studentData.length;
+            }
+        } catch (e) {
+            console.error("Failed to fetch students count:", e);
+        }
+
         if (!data || data.message === "No evaluated data yet" || (Array.isArray(data) && data.length === 0)) {
             showEmptyState();
             return;

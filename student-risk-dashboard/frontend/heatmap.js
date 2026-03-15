@@ -99,8 +99,11 @@ function renderMarkers(data) {
         else if (school.risk_concentration === 'Moderate') color = '#eab308'; // yellow-500
         else if (school.risk_concentration === 'Low') color = '#10b981'; // emerald-500
 
+        // Compute radius: base size 4, plus extra based on student volume (max 10)
+        const radiusSize = Math.max(4, Math.min(10, 4 + (school.total_students / 250)));
+        
         const circleMarker = L.circleMarker([school.lat, school.lng], {
-            radius: Math.max(10, Math.min(30, school.total_students / 2)), // Size implies volume
+            radius: radiusSize,
             fillColor: color,
             color: '#ffffff',
             weight: 2,
@@ -108,14 +111,28 @@ function renderMarkers(data) {
             fillOpacity: 0.8
         });
 
-        // Simple tooltip
-        circleMarker.bindTooltip(`<b>${school.school_name}</b><br>High Risk: ${school.high_risk_pct}%`);
+        // Beautiful Attention-Grabbing Popup
+        const popupContent = `
+            <div class="bg-gradient-to-br from-indigo-900 to-purple-950 text-white p-4 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border-2" style="border-color: ${color}">
+                <h4 class="font-black text-lg mb-1 leading-tight text-white">${school.school_name}</h4>
+                <div class="flex justify-between items-center gap-4 mt-3 bg-black/40 p-2.5 rounded-lg border border-white/10">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-purple-300">High Risk</span>
+                    <span class="font-black text-xl drop-shadow-md" style="color: ${color}">${school.high_risk_pct}%</span>
+                </div>
+            </div>
+        `;
+
+        circleMarker.bindPopup(popupContent, {
+            closeButton: false,
+            className: 'custom-leaflet-popup',
+            minWidth: 220
+        });
 
         // Click event to update side panel
         circleMarker.on('click', () => {
             updateSidePanel(school);
-            // Highlight selected marker visually
-            map.setView([school.lat, school.lng], map.getZoom(), { animate: true });
+            // Highlight selected marker visually and zoom in a bit
+            map.setView([school.lat, school.lng], Math.max(map.getZoom(), 9), { animate: true });
         });
 
         circleMarker.addTo(markerGroup);
