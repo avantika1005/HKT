@@ -95,7 +95,7 @@ async function loadAnalyticsPreview() {
     }
 }
 function loadGeneralInterventions() {
-    const container = document.getElementById("interventionPlaybook");
+    const container = document.getElementById("playbookContainer");
     if (!container) return;
 
     container.innerHTML = `
