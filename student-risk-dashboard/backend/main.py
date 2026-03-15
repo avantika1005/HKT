@@ -10,11 +10,11 @@ import os
 import uuid
 import datetime
 
-from models import Base, Student, Intervention
-from ml_model import model_instance
-from llm_service import generate_explanation, generate_parent_communication
-from intervention_engine import intervention_engine
-from scheme_matcher import scheme_matcher
+from .models import Base, Student, Intervention
+from .ml_model import model_instance
+from .llm_service import generate_explanation, generate_parent_communication
+from .intervention_engine import intervention_engine
+from .scheme_matcher import scheme_matcher
 
 # DB Setup
 if os.environ.get("VERCEL"):
@@ -25,8 +25,11 @@ else:
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# ensure database schema is always up to date; we aggressively drop+recreate when uploading new CSVs
-Base.metadata.create_all(bind=engine)
+# ensure database schema is always up to date
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Database init error: {e}")
 
 def get_db():
     db = SessionLocal()
@@ -455,8 +458,6 @@ def get_district_heatmap(db: Session = Depends(get_db)):
             
     return result
 
-# Serve frontend static files
-# Use absolute paths for deployment robustness
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "frontend"))
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+
+# Serve frontend static files - REMOVED FOR VERCEL
+# Vercel handles static serving via vercel.json rewrites

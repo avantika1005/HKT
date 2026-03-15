@@ -1,0 +1,68 @@
+Student ID,Student Name,Class / Grade,Attendance Percentage,Latest Exam Score,Previous Exam Score,Distance from School (km),Midday Meal Participation (Yes/No),Midday Meal Participation Rate (%),Sibling Dropout History (Yes/No),School Name,Block Name,District Name
+1001,Aarav Sharma,Grade 6,92,78,74,1.2,Yes,95,No,Kanchipuram Govt Model School,Kanchipuram Central,Kanchipuram
+1002,Priya Patel,Grade 6,85,65,70,2.5,Yes,88,No,Kanchipuram Govt Model School,Kanchipuram Central,Kanchipuram
+1003,Rohan Mehta,Grade 6,60,42,50,5.8,No,40,Yes,Kanchipuram Govt Model School,Kanchipuram Central,Kanchipuram
+1004,Sneha Iyer,Grade 6,78,55,60,3.1,Yes,75,No,Kanchipuram Govt Model School,Kanchipuram Central,Kanchipuram
+1006,Anjali Singh,Grade 7,95,88,85,0.8,Yes,98,No,Walajabad Panchayat Union School,Walajabad,Kanchipuram
+1007,Vikram Nair,Grade 7,72,58,55,4.0,Yes,68,No,Walajabad Panchayat Union School,Walajabad,Kanchipuram
+1008,Divya Reddy,Grade 7,88,74,72,1.5,Yes,90,No,Walajabad Panchayat Union School,Walajabad,Kanchipuram
+1009,Siddharth Joshi,Grade 7,55,38,45,6.5,No,35,Yes,Walajabad Panchayat Union School,Walajabad,Kanchipuram
+1011,Arjun Gupta,Grade 8,67,48,52,4.8,No,55,No,Sriperumbudur Excellence Academy,Sriperumbudur,Kanchipuram
+1012,Pooja Desai,Grade 8,50,35,40,8.1,No,28,Yes,Sriperumbudur Excellence Academy,Sriperumbudur,Kanchipuram
+2001,Murali Krish,Grade 9,89,76,73,1.8,Yes,91,No,Chennai Public School,Alandur,Chennai
+2002,Aditi Rao,Grade 9,74,60,58,3.5,Yes,72,No,Chennai Public School,Alandur,Chennai
+2003,Rahul S,Grade 9,48,32,36,7.8,No,22,Yes,Chennai Public School,Alandur,Chennai
+2004,Vignesh P,Grade 9,83,69,65,2.2,Yes,85,No,Chennai Public School,Alandur,Chennai
+2005,Nandini K,Grade 9,93,85,82,0.9,Yes,96,No,Chennai Public School,Alandur,Chennai
+3001,Harsh M,Grade 6,58,40,44,6.0,No,38,Yes,Madurai Central School,Madurai West,Madurai
+3002,Swati B,Grade 6,87,72,68,2.0,Yes,87,No,Madurai Central School,Madurai West,Madurai
+3003,Vishal T,Grade 7,70,54,57,4.2,Yes,65,No,Madurai Central School,Madurai West,Madurai
+3004,Ananya B,Grade 7,94,87,84,0.7,Yes,97,No,Madurai Central School,Madurai West,Madurai
+3005,Gaurav S,Grade 7,43,28,33,8.5,No,18,Yes,Madurai Central School,Madurai West,Madurai
+4001,Shruti K,Grade 8,82,67,63,2.6,Yes,83,No,Coimbatore Excellence,Perur,Coimbatore
+4002,Manish A,Grade 8,65,46,51,5.2,No,48,No,Coimbatore Excellence,Perur,Coimbatore
+4003,Deepika N,Grade 8,90,80,77,1.3,Yes,92,No,Coimbatore Excellence,Perur,Coimbatore
+4004,Rajesh S,Grade 8,53,37,42,7.0,No,30,Yes,Coimbatore Excellence,Perur,Coimbatore
+5001,Pallavi J,Grade 9,77,61,59,3.3,Yes,78,No,Salem Govt School,Salem Rural,Salem
+5002,Tushar G,Grade 6,97,93,90,0.4,Yes,100,No,Salem Govt School,Salem Rural,Salem
+5003,Ishaan P,Grade 6,61,43,48,5.9,No,40,No,Salem Govt School,Salem Rural,Salem
+5004,Ritika D,Grade 7,86,71,67,2.1,Yes,88,No,Salem Govt School,Salem Rural,Salem
+6001,Akash M,Grade 7,49,33,38,7.6,No,25,Yes,Trichy Model School,Manikandam,Tiruchirappalli
+6002,Shraddha K,Grade 8,79,64,61,3.0,Yes,81,No,Trichy Model School,Manikandam,Tiruchirappalli
+6003,Kartik B,Grade 8,66,47,53,5.0,No,50,No,Trichy Model School,Manikandam,Tiruchirappalli
+7001,Neha K,Grade 9,92,83,80,1.1,Yes,94,No,Tirunelveli High School,Palayamkottai,Tirunelveli
+7002,Pranav S,Grade 9,57,39,43,6.3,No,35,Yes,Tirunelveli High School,Palayamkottai,Tirunelveli
+7003,Sanya T,Grade 9,84,70,66,2.4,Yes,86,No,Tirunelveli High School,Palayamkottai,Tirunelveli
+8001,Yash P,Grade 6,46,31,35,8.0,No,20,Yes,Vellore Heritage School,Katpadi,Vellore
+8002,Trisha N,Grade 7,88,75,71,1.6,Yes,91,No,Vellore Heritage School,Katpadi,Vellore
+8003,Omkar D,Grade 8,73,57,54,4.1,Yes,70,No,Vellore Heritage School,Katpadi,Vellore
+9001,Karthik M,Grade 6,55,42,48,5.5,Yes,60,No,Nilgiris Mountain School,Ooty,Nilgiris
+9002,Priya S,Grade 7,85,78,72,2.0,Yes,90,No,Nilgiris Mountain School,Ooty,Nilgiris
+9003,Ravi K,Grade 8,62,49,55,6.1,No,45,Yes,Nilgiris Mountain School,Ooty,Nilgiris
+10001,Muthu V,Grade 9,92,85,82,1.2,Yes,95,No,Thanjavur Delta Academy,Thanjavur,Thanjavur
+10002,Kamala R,Grade 6,48,36,40,7.2,No,30,Yes,Thanjavur Delta Academy,Thanjavur,Thanjavur
+10003,Surya T,Grade 7,76,65,60,3.5,Yes,82,No,Thanjavur Delta Academy,Thanjavur,Thanjavur
+11001,Meena N,Grade 8,88,79,75,1.8,Yes,92,No,Kanyakumari Coastal Govt,Agastheeswaram,Kanyakumari
+11002,Vijay C,Grade 9,51,39,45,6.8,No,35,Yes,Kanyakumari Coastal Govt,Agastheeswaram,Kanyakumari
+11003,Anitha K,Grade 6,70,58,54,4.2,Yes,75,No,Kanyakumari Coastal Govt,Agastheeswaram,Kanyakumari
+12001,Siva P,Grade 7,95,88,84,0.9,Yes,98,No,Erode Textile City School,Erode,Erode
+12002,Geetha M,Grade 8,45,34,38,8.5,No,25,Yes,Erode Textile City School,Erode,Erode
+12003,Selvam R,Grade 9,80,68,64,2.8,Yes,85,No,Erode Textile City School,Erode,Erode
+13001,Radha S,Grade 6,86,76,70,1.5,Yes,90,No,Thoothukudi Port Academy,Thoothukudi,Thoothukudi
+13002,Kumar V,Grade 7,53,40,46,6.5,No,38,Yes,Thoothukudi Port Academy,Thoothukudi,Thoothukudi
+13003,Nithya B,Grade 8,72,60,56,4.0,Yes,78,No,Thoothukudi Port Academy,Thoothukudi,Thoothukudi
+14001,Ganesh N,Grade 9,94,86,82,1.0,Yes,96,No,Dindigul Fort High,Dindigul,Dindigul
+14002,Kavitha C,Grade 6,49,37,42,7.5,No,32,Yes,Dindigul Fort High,Dindigul,Dindigul
+14003,Ramesh T,Grade 7,78,66,62,3.1,Yes,83,No,Dindigul Fort High,Dindigul,Dindigul
+15001,Uma K,Grade 8,91,82,78,1.4,Yes,94,No,Tiruvannamalai Heritage,Thiruvannamalai,Tiruvannamalai
+15002,Raja M,Grade 9,56,43,49,5.8,Yes,65,No,Tiruvannamalai Heritage,Thiruvannamalai,Tiruvannamalai
+15003,Babu S,Grade 6,82,71,67,2.5,Yes,88,No,Tiruvannamalai Heritage,Thiruvannamalai,Tiruvannamalai
+16001,Valli P,Grade 7,89,80,76,1.7,Yes,93,No,Cuddalore Coast School,Cuddalore,Cuddalore
+16002,Suresh R,Grade 8,50,38,44,7.0,No,34,Yes,Cuddalore Coast School,Cuddalore,Cuddalore
+16003,Jyothi V,Grade 9,75,63,59,3.8,Yes,80,No,Cuddalore Coast School,Cuddalore,Cuddalore
+17001,Murugan D,Grade 6,96,89,85,0.7,Yes,99,No,Karur Kongu Academy,Karur,Karur
+17002,Aruna K,Grade 7,44,32,36,8.8,No,22,Yes,Karur Kongu Academy,Karur,Karur
+17003,Prakash N,Grade 8,81,69,65,2.7,Yes,86,No,Karur Kongu Academy,Karur,Karur
+18001,Devi S,Grade 9,87,77,73,1.6,Yes,91,No,Krishnagiri Border School,Krishnagiri,Krishnagiri
+18002,Vasanth M,Grade 6,54,41,47,6.2,No,40,Yes,Krishnagiri Border School,Krishnagiri,Krishnagiri
+18003,Sindhu R,Grade 7,74,62,58,3.9,Yes,79,No,Krishnagiri Border School,Krishnagiri,Krishnagiri
