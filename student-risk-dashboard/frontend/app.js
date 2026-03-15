@@ -99,33 +99,35 @@ function loadGeneralInterventions() {
     if (!container) return;
 
     container.innerHTML = `
-        <div class="text-left space-y-3">
-            <div class="bg-red-50 p-3 rounded border border-red-100">
-                <div class="font-bold text-red-700 text-xs uppercase">High Risk</div>
-                <ul class="text-sm mt-1 list-disc ml-4">
+        <div class="text-left space-y-4">
+
+            <div class="bg-red-100 p-4 rounded-xl border-l-8 border-red-600 shadow text-gray-900">
+                <div class="font-black text-red-700 text-sm uppercase mb-2">High Risk</div>
+                <ul class="text-sm list-disc ml-5">
                     <li>Parent–Teacher Meeting</li>
                     <li>Attendance Monitoring</li>
                     <li>Academic Counseling</li>
                 </ul>
             </div>
 
-            <div class="bg-yellow-50 p-3 rounded border border-yellow-100">
-                <div class="font-bold text-yellow-700 text-xs uppercase">Medium Risk</div>
-                <ul class="text-sm mt-1 list-disc ml-4">
+            <div class="bg-yellow-100 p-4 rounded-xl border-l-8 border-yellow-600 shadow text-gray-900">
+                <div class="font-black text-yellow-700 text-sm uppercase mb-2">Medium Risk</div>
+                <ul class="text-sm list-disc ml-5">
                     <li>Peer Mentoring</li>
                     <li>Extra Tutoring</li>
                     <li>Weekly Progress Tracking</li>
                 </ul>
             </div>
 
-            <div class="bg-green-50 p-3 rounded border border-green-100">
-                <div class="font-bold text-green-700 text-xs uppercase">Low Risk</div>
-                <ul class="text-sm mt-1 list-disc ml-4">
+            <div class="bg-green-100 p-4 rounded-xl border-l-8 border-green-600 shadow text-gray-900">
+                <div class="font-black text-green-700 text-sm uppercase mb-2">Low Risk</div>
+                <ul class="text-sm list-disc ml-5">
                     <li>Skill Development Programs</li>
                     <li>Scholarship Awareness</li>
                     <li>Career Guidance</li>
                 </ul>
             </div>
+
         </div>
     `;
 }
