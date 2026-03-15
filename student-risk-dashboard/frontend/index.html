@@ -170,24 +170,8 @@ Government Schemes for Students
 Recent Alerts
 </h2>
 
-<ul class="space-y-4 text-black font-bold">
-
-<li class="bg-red-50 border-l-4 border-red-600 p-4 rounded-lg">
-Ravi Kumar – Attendance dropped below 60%
-</li>
-
-<li class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-lg">
-Anita – Grade decline detected
-</li>
-
-<li class="bg-yellow-50 border-l-4 border-yellow-700 p-4 rounded-lg">
-Imran – Performance slightly varied
-</li>
-
-<li class="bg-green-50 border-l-4 border-green-600 p-4 rounded-lg">
-System Update – Data refreshed
-</li>
-
+<ul id="alertsContainer" class="space-y-4 text-black font-bold">
+    <li class="text-gray-500 italic p-4 text-sm">Loading alerts…</li>
 </ul>
 
 </div>
@@ -216,7 +200,22 @@ System Update – Data refreshed
 Risk Distribution
 </h2>
 
-<div class="flex flex-col items-center justify-center" style="height:300px">
+<div class="grid grid-cols-3 gap-2 mb-6 text-center">
+    <div class="bg-red-50 p-3 rounded-xl border border-red-100">
+        <div class="text-[10px] font-black text-red-700 uppercase tracking-widest">High</div>
+        <div id="highRiskCount" class="text-2xl font-black text-red-900">--</div>
+    </div>
+    <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-100">
+        <div class="text-[10px] font-black text-yellow-700 uppercase tracking-widest">Med</div>
+        <div id="medRiskCount" class="text-2xl font-black text-yellow-900">--</div>
+    </div>
+    <div class="bg-green-50 p-3 rounded-xl border border-green-100">
+        <div class="text-[10px] font-black text-green-700 uppercase tracking-widest">Low</div>
+        <div id="lowRiskCount" class="text-2xl font-black text-green-900">--</div>
+    </div>
+</div>
+
+<div class="flex flex-col items-center justify-center" style="height:250px">
 <canvas id="riskChart"></canvas>
 </div>
 
@@ -244,121 +243,119 @@ KMHSC • 2026 © Only For Educational Purpose
 
 
 
-<!-- SCHEME POPUP -->
-
-<div id="schemePopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
-<div class="bg-white text-black p-8 rounded-2xl shadow-2xl max-w-lg">
-
-<h2 id="schemeTitle" class="text-2xl font-black mb-4"></h2>
-
-<p id="schemeContent" class="font-bold text-gray-700 mb-6"></p>
-
-<button onclick="closeScheme()" class="bg-purple-900 text-white px-6 py-2 rounded-lg font-bold">
-Close
-</button>
-
+<!-- PREMIUM GLOBAL MODAL -->
+<div id="globalModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-purple-950/80 backdrop-blur-xl"></div>
+    <div class="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] overflow-hidden transform transition-all border-4 border-white/20">
+        <div class="h-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400"></div>
+        <div class="p-10 flex flex-col items-center text-center">
+            <div id="modalIcon" class="w-20 h-20 bg-purple-50 rounded-3xl flex items-center justify-center text-4xl mb-6 shadow-inner">
+                ✨
+            </div>
+            <h2 id="modalTitle" class="text-3xl font-black text-purple-950 uppercase tracking-tight mb-4 leading-none"></h2>
+            <div class="w-12 h-1 bg-purple-100 rounded-full mb-6"></div>
+            <p id="modalContent" class="text-gray-600 font-bold leading-relaxed mb-10 text-lg"></p>
+            
+            <button onclick="closeModal()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black py-5 rounded-3xl shadow-[0_12px_24px_-8px_rgba(79,70,229,0.5)] transform hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest text-sm">
+                Dismiss Notice
+            </button>
+        </div>
+    </div>
 </div>
-
-</div>
-
-
 
 <script>
-
 /* ADMIN DROPDOWN */
-
 document.getElementById('adminBtn').addEventListener('click',function(e){
-e.stopPropagation();
-document.getElementById('adminDropdown').classList.toggle('hidden');
+    e.stopPropagation();
+    document.getElementById('adminDropdown').classList.toggle('hidden');
 });
 
 document.addEventListener('click',function(event){
-const adminArea=document.querySelector('.relative');
-if(!adminArea.contains(event.target)){
-document.getElementById('adminDropdown').classList.add('hidden');
-}
-});
-
-
-/* CHART */
-
-new Chart(document.getElementById('riskChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['High Risk', 'Medium Risk', 'Low Risk'],
-    datasets: [{
-      data: [5, 12, 18],
-      backgroundColor: ['#dc2626', '#eab308', '#16a34a']
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top',
-        align: 'center',
-        labels: {
-          font: {
-            size: 14,
-            weight: 'bold'
-          },
-          padding: 20
-        }
-      }
+    const adminArea=document.querySelector('.relative');
+    if(adminArea && !adminArea.contains(event.target)){
+        document.getElementById('adminDropdown').classList.add('hidden');
     }
-  }
 });
 
+/* CUSTOM MODAL LOGIC */
+function showModal(title, text, emoji = "ℹ️") {
+    const modal = document.getElementById("globalModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+    const modalIcon = document.getElementById("modalIcon");
 
-/* SCHEME POPUP */
+    modalTitle.innerText = title;
+    modalContent.innerText = text;
+    modalIcon.innerText = emoji;
 
-function openScheme(type){
-
-const title=document.getElementById("schemeTitle");
-const content=document.getElementById("schemeContent");
-
-const schemes={
-
-scholarship:{
-title:"National Scholarship Portal",
-text:"Provides financial assistance to students from economically weaker sections through central and state government scholarships."
-},
-
-textbook:{
-title:"Free Textbook Scheme",
-text:"Government provides free textbooks to students in government and government aided schools."
-},
-
-midday:{
-title:"Midday Meal Program",
-text:"Nutritious meals are provided to students to improve health, attendance and learning."
-},
-
-bus:{
-title:"Free Bus Pass Scheme",
-text:"Students can travel free between home and school using government bus services."
-},
-
-digital:{
-title:"Digital Learning Scheme",
-text:"Students receive laptops or digital resources to support modern education."
+    modal.classList.remove("hidden");
+    modal.querySelector('div:nth-child(2)').classList.add('animate-in', 'fade-in', 'zoom-in', 'duration-300');
 }
 
+function closeModal() {
+    document.getElementById("globalModal").classList.add("hidden");
+}
+
+/* OVERRIDE BROWSER ALERT */
+window.alert = function(message) {
+    let title = "System Notification";
+    let emoji = "🔔";
+    
+    if (message.toLowerCase().includes("success")) {
+        title = "Operation Successful";
+        emoji = "✅";
+    } else if (message.toLowerCase().includes("fail") || message.toLowerCase().includes("error")) {
+        title = "Attention Required";
+        emoji = "⚠️";
+    }
+    
+    showModal(title, message, emoji);
 };
 
-title.innerText=schemes[type].title;
-content.innerText=schemes[type].text;
+/* REDEFINE checkSchemes to prevent double triggers and use modal */
+window.checkSchemes = function() {
+    // No-op to prevent app.js default alert
+    return false;
+};
 
-document.getElementById("schemePopup").classList.remove("hidden");
+/* SCHEME POPUP OVERRIDE */
+function openScheme(type){
+    const schemes = {
+        scholarship: {
+            title: "Scholarship Portal",
+            text: "Provides financial assistance to students from economically weaker sections through central and state government scholarships.",
+            emoji: "🎓"
+        },
+        textbook: {
+            title: "Free Textbook Scheme",
+            text: "Government provides free textbooks to students in government and government aided schools.",
+            emoji: "📚"
+        },
+        midday: {
+            title: "Midday Meal Program",
+            text: "Nutritious meals are provided to students to improve health, attendance and learning.",
+            emoji: "🍱"
+        },
+        bus: {
+            title: "Free Bus Pass Scheme",
+            text: "Students can travel free between home and school using government bus services.",
+            emoji: "🚌"
+        },
+        digital: {
+            title: "Digital Learning Scheme",
+            text: "Students receive laptops or digital resources to support modern education.",
+            emoji: "💻"
+        }
+    };
 
+    const scheme = schemes[type];
+    showModal(scheme.title, scheme.text, scheme.emoji);
 }
 
-function closeScheme(){
-document.getElementById("schemePopup").classList.add("hidden");
-}
-
+document.addEventListener('DOMContentLoaded', () => {
+    // Ensure checkSchemes is overridden even after app.js loads
+    window.checkSchemes = function() { /* stay silent */ };
+});
 </script>
 <script src="app.js"></script>
 </body>

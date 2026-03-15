@@ -129,9 +129,9 @@ function updateSidePanel(school) {
     document.getElementById('panelSchoolName').textContent = school.school_name;
     document.getElementById('panelBlockName').textContent = school.district_name + " District, " + school.block_name + " Block";
     document.getElementById('panelTotal').textContent = school.total_students;
-    document.getElementById('panelHighRisk').textContent = `${school.high_risk_count} (${school.high_risk_pct}%)`;
-    document.getElementById('panelAvgRisk').textContent = school.avg_risk_score;
-    document.getElementById('panelAvgAtt').textContent = `${school.avg_attendance}%`;
+    document.getElementById('panelHighRisk').textContent = `${school.high_risk_count} (${Number(school.high_risk_pct).toFixed(1)}%)`;
+    document.getElementById('panelAvgRisk').textContent = Number(school.avg_risk_score).toFixed(1);
+    document.getElementById('panelAvgAtt').textContent = `${Number(school.avg_attendance).toFixed(1)}%`;
 
     const factorsContainer = document.getElementById('panelFactors');
     factorsContainer.innerHTML = '';

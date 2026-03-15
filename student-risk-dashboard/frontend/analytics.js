@@ -57,8 +57,8 @@ function renderAnalytics(items) {
     tableBody.innerHTML = items.map(item => `
         <tr class="border-b border-purple-50 hover:bg-purple-50/50 transition-colors">
             <td class="py-4 px-2 font-black text-indigo-950 uppercase text-sm">${item.intervention}</td>
-            <td class="py-4 px-2 font-black text-emerald-600">${item.success_rate}%</td>
-            <td class="py-4 px-2 font-bold text-rose-600">+${item.avg_attendance_improvement}%</td>
+            <td class="py-4 px-2 font-black text-emerald-600">${Math.round(item.success_rate)}%</td>
+            <td class="py-4 px-2 font-bold text-rose-600">${item.avg_attendance_improvement >= 0 ? '+' : ''}${item.avg_attendance_improvement.toFixed(1)}%</td>
             <td class="py-4 px-2 font-bold text-gray-500">${item.total_logs} logs</td>
         </tr>
     `).join('');

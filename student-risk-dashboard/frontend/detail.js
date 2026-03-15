@@ -37,17 +37,17 @@ function renderDetail(data) {
     document.getElementById('disp_id').innerText = student.student_id;
     document.getElementById('disp_grade').innerText = student.grade_class;
     
-    document.getElementById('disp_attendance').innerText = `${student.attendance_pct}%`;
-    document.getElementById('disp_latest').innerText = student.latest_exam_score;
-    document.getElementById('disp_previous').innerText = student.previous_exam_score;
-    document.getElementById('disp_distance').innerText = `${student.distance_km} KM`;
+    document.getElementById('disp_attendance').innerText = `${student.attendance_pct.toFixed(1)}%`;
+    document.getElementById('disp_latest').innerText = student.latest_exam_score.toFixed(1);
+    document.getElementById('disp_previous').innerText = student.previous_exam_score.toFixed(1);
+    document.getElementById('disp_distance').innerText = `${student.distance_km.toFixed(1)} KM`;
 
     document.getElementById('disp_level').innerText = student.risk_level;
-    document.getElementById('disp_score').innerText = `${student.risk_score}/100`;
+    document.getElementById('disp_score').innerText = `${student.risk_score.toFixed(1)}/100`;
 
     // Meal Participation UI
     const mealPct = student.meal_participation_pct || 0;
-    document.getElementById('disp_meal_pct').innerText = `${mealPct}%`;
+    document.getElementById('disp_meal_pct').innerText = `${mealPct.toFixed(1)}%`;
     const circle = document.getElementById('meal_circle');
     const radius = 35;
     const circumference = 2 * Math.PI * radius;
@@ -149,9 +149,9 @@ function renderInterventionHistory(interventions) {
 
         const evolutionInfo = inv.is_evaluated ? `
             <div class="text-[10px] space-y-0.5">
-                <p class="font-bold text-gray-500">ATT: <span class="${(inv.outcome_attendance > inv.baseline_attendance) ? 'text-green-600' : 'text-red-500'} font-black">${inv.outcome_attendance}%</span></p>
-                <p class="font-bold text-gray-500">SCORE: <span class="${(inv.outcome_score > inv.baseline_score) ? 'text-green-600' : 'text-red-500'} font-black">${inv.outcome_score}</span></p>
-                <p class="font-bold text-gray-500">RISK: <span class="${(inv.outcome_risk_score < inv.baseline_risk_score) ? 'text-green-600' : 'text-red-500'} font-black">${inv.outcome_risk_score}/100</span></p>
+                <p class="font-bold text-gray-500">ATT: <span class="${(inv.outcome_attendance > inv.baseline_attendance) ? 'text-green-600' : 'text-red-500'} font-black">${Number(inv.outcome_attendance || 0).toFixed(1)}%</span></p>
+                <p class="font-bold text-gray-500">SCORE: <span class="${(inv.outcome_score > inv.baseline_score) ? 'text-green-600' : 'text-red-500'} font-black">${Number(inv.outcome_score || 0).toFixed(1)}</span></p>
+                <p class="font-bold text-gray-500">RISK: <span class="${(inv.outcome_risk_score < inv.baseline_risk_score) ? 'text-green-600' : 'text-red-500'} font-black">${Number(inv.outcome_risk_score || 0).toFixed(1)}/100</span></p>
             </div>
         ` : '<span class="text-[10px] font-bold text-gray-300 italic">Waiting for 30-day data...</span>';
 

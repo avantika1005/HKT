@@ -112,9 +112,9 @@ function renderStudents(students) {
                 <td class="py-5 px-6">
                     <div class="flex items-center gap-2">
                         <div class="w-12 bg-gray-100 h-2 rounded-full overflow-hidden">
-                            <div class="bg-purple-600 h-full" style="width: ${student.risk_score || 0}%"></div>
+                            <div class="bg-purple-600 h-full" style="width: ${Math.round(student.risk_score || 0)}%"></div>
                         </div>
-                        <span class="font-black text-purple-900 text-sm">${student.risk_score || 0}%</span>
+                        <span class="font-black text-purple-900 text-sm">${Math.round(student.risk_score || 0)}%</span>
                     </div>
                 </td>
                 <td class="py-5 px-6 text-center">

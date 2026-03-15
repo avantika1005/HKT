@@ -1,4 +1,5 @@
 const API_BASE = "/api";
+let riskChart = null;
 
 function uploadData() {
     const fileInput = document.getElementById("csvFileInput");
@@ -25,8 +26,7 @@ function uploadData() {
     .then(res => {
         if (res.ok) {
             alert("Student data uploaded and processed successfully!");
-            // Open student list in a new window/tab as requested
-            window.open("students.html", "_blank");
+            location.reload();
         } else {
             return res.json().then(data => {
                 alert("Upload failed: " + (data.detail || "Unknown error"));
@@ -57,17 +57,128 @@ function checkSchemes() {
     alert("Checking eligible government schemes for the student...");
 }
 
+async function loadRiskStats() {
+    console.log("DEBUG: loadRiskStats() called");
+    try {
+        const response = await fetch(`${API_BASE}/students`);
+        if (!response.ok) throw new Error("Failed to fetch students");
+        const students = await response.json();
+        
+        let high = 0, med = 0, low = 0;
+        students.forEach(s => {
+            if (s.risk_level === 'High') high++;
+            else if (s.risk_level === 'Medium') med++;
+            else if (s.risk_level === 'Low') low++;
+        });
+
+        const hEl = document.getElementById("highRiskCount");
+        const mEl = document.getElementById("medRiskCount");
+        const lEl = document.getElementById("lowRiskCount");
+        
+        if (hEl) hEl.innerText = Math.round(high);
+        if (mEl) mEl.innerText = Math.round(med);
+        if (lEl) lEl.innerText = Math.round(low);
+
+        updateRiskChart(high, med, low);
+        updatePlaybookCounts(high, med, low);
+        updateAlerts(students);
+
+    } catch (err) {
+        console.error("DEBUG: loadRiskStats error:", err);
+    }
+}
+
+function updateRiskChart(high, med, low) {
+    const ctx = document.getElementById('riskChart');
+    if (!ctx) return;
+
+    if (riskChart) {
+        riskChart.data.datasets[0].data = [high, med, low];
+        riskChart.update();
+    } else {
+        riskChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+                datasets: [{
+                    data: [high, med, low],
+                    backgroundColor: ['#dc2626', '#eab308', '#16a34a'],
+                    borderWidth: 0,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 12, weight: 'bold' },
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function updatePlaybookCounts(high, med, low) {
+    const hBadge = document.getElementById("highCountBadge");
+    const mBadge = document.getElementById("medCountBadge");
+    const lBadge = document.getElementById("lowCountBadge");
+
+    if (hBadge) hBadge.innerText = `${high} Students`;
+    if (mBadge) mBadge.innerText = `${med} Students`;
+    if (lBadge) lBadge.innerText = `${low} Students`;
+}
+
+function updateAlerts(students) {
+    const container = document.getElementById("alertsContainer");
+    if (!container) return;
+
+    const alerts = students
+        .filter(s => s.risk_level === 'High')
+        .slice(0, 4);
+
+    if (alerts.length === 0) {
+        container.innerHTML = `<li class="bg-green-50 border-l-4 border-green-600 p-4 rounded-lg text-sm">No critical risk students detected.</li>`;
+        return;
+    }
+
+    container.innerHTML = alerts.map(s => {
+        let trigger = "Requires immediate attention";
+        if (s.attendance_pct < 75) trigger = `Critical attendance drop: ${s.attendance_pct.toFixed(1)}%`;
+        else if (s.latest_exam_score < 50) trigger = `Low academic performance: ${s.latest_exam_score.toFixed(1)}%`;
+        else if (s.sibling_dropout) trigger = "Family history of dropout detected";
+        else if (s.top_factors) trigger = `Primary risk: ${s.top_factors.split(',')[0]}`;
+
+        return `
+            <li class="bg-red-50 border-l-4 border-red-600 p-4 rounded-lg flex justify-between items-center group transition-all hover:bg-red-100">
+                <div>
+                    <span class="text-red-900 font-extrabold text-sm uppercase tracking-tight">${s.name}</span>
+                    <p class="text-[11px] text-red-700 font-bold uppercase mt-0.5 tracking-tight">${trigger}</p>
+                </div>
+                <a href="student-detail.html?id=${s.id}" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity uppercase font-black shadow-lg">View &rarr;</a>
+            </li>
+        `;
+    }).join('');
+}
+
 async function loadAnalyticsPreview() {
     const container = document.getElementById("analyticsContainer");
     if (!container) return;
     
     try {
         const response = await fetch(`${API_BASE}/analytics/interventions`);
-        if (!response.ok) throw new Error("Failed");
+        if (!response.ok) throw new Error("Failed to fetch analytics");
         const data = await response.json();
         
         if (!data || data.length === 0 || data.message === "No evaluated data yet") {
-            container.innerHTML = "No outcome data yet. Check back later.";
+            container.innerHTML = `<p class="italic text-gray-400">No outcome data yet. Check back later.</p>`;
             return;
         }
         
@@ -80,83 +191,85 @@ async function loadAnalyticsPreview() {
                 </div>
                 <div class="flex justify-between items-center bg-indigo-50 p-3 rounded-lg border border-indigo-100">
                     <span class="font-black text-indigo-900 uppercase text-xs">Success Rate:</span>
-                    <span class="font-bold text-indigo-700 text-sm">${top.success_rate}%</span>
+                    <span class="font-bold text-indigo-700 text-sm">${Math.round(top.success_rate)}%</span>
                 </div>
                 <div class="flex justify-between items-center bg-rose-50 p-3 rounded-lg border border-rose-100">
                     <span class="font-black text-rose-900 uppercase text-xs">Avg Boost:</span>
-                    <span class="font-bold text-rose-700 text-sm">+${top.avg_attendance_improvement}%</span>
+                    <span class="font-bold text-rose-700 text-sm">${top.avg_attendance_improvement >= 0 ? '+' : ''}${top.avg_attendance_improvement.toFixed(1)}%</span>
                 </div>
-                <a href="analytics.html" class="mt-4 block text-center text-[10px] font-black tracking-widest text-indigo-600 hover:text-indigo-800 uppercase underline">View Full View &rarr;</a>
+                <a href="analytics.html" class="mt-4 block text-center text-[10px] font-black tracking-widest text-indigo-600 hover:text-indigo-800 uppercase underline">View Full Analytics &rarr;</a>
             </div>
         `;
     } catch (err) {
-        console.error(err);
-        container.innerHTML = "Failed to load analytics preview.";
+        console.error("DEBUG: loadAnalyticsPreview error:", err);
+        container.innerHTML = `<p class="text-red-500 font-bold">Failed to load analytics preview.</p>`;
     }
 }
+
 function loadGeneralInterventions() {
     const container = document.getElementById("playbookContainer");
     if (!container) return;
 
     container.innerHTML = `
         <div class="text-left space-y-4">
-
-            <div class="bg-red-100 p-4 rounded-xl border-l-8 border-red-600 shadow text-gray-900">
-                <div class="font-black text-red-700 text-sm uppercase mb-2">High Risk</div>
-                <ul class="text-sm list-disc ml-5">
-                    <li>Parent–Teacher Meeting</li>
-                    <li>Attendance Monitoring</li>
-                    <li>Academic Counseling</li>
+            <div class="bg-red-100 p-4 rounded-xl border-l-8 border-red-600 shadow-md text-gray-900">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="font-black text-red-700 text-sm uppercase">🔴 High Risk</div>
+                    <span id="highCountBadge" class="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">-- Students</span>
+                </div>
+                <ul class="text-xs list-disc ml-5 font-bold text-gray-700">
+                    <li>Immediate Parent–Teacher Meeting</li>
+                    <li>Daily Attendance Monitoring</li>
+                    <li>One-on-One Academic Counseling</li>
                 </ul>
             </div>
-
-            <div class="bg-yellow-100 p-4 rounded-xl border-l-8 border-yellow-600 shadow text-gray-900">
-                <div class="font-black text-yellow-700 text-sm uppercase mb-2">Medium Risk</div>
-                <ul class="text-sm list-disc ml-5">
-                    <li>Peer Mentoring</li>
-                    <li>Extra Tutoring</li>
+            <div class="bg-yellow-100 p-4 rounded-xl border-l-8 border-yellow-600 shadow-md text-gray-900">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="font-black text-yellow-700 text-sm uppercase">🟡 Medium Risk</div>
+                    <span id="medCountBadge" class="bg-yellow-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">-- Students</span>
+                </div>
+                <ul class="text-xs list-disc ml-5 font-bold text-gray-700">
+                    <li>Peer Mentoring Program</li>
+                    <li>Extra After-School Tutoring</li>
                     <li>Weekly Progress Tracking</li>
                 </ul>
             </div>
-
-            <div class="bg-green-100 p-4 rounded-xl border-l-8 border-green-600 shadow text-gray-900">
-                <div class="font-black text-green-700 text-sm uppercase mb-2">Low Risk</div>
-                <ul class="text-sm list-disc ml-5">
-                    <li>Skill Development Programs</li>
+            <div class="bg-green-100 p-4 rounded-xl border-l-8 border-green-600 shadow-md text-gray-900">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="font-black text-green-700 text-sm uppercase">🟢 Low Risk</div>
+                    <span id="lowCountBadge" class="bg-green-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">-- Students</span>
+                </div>
+                <ul class="text-xs list-disc ml-5 font-bold text-gray-700">
+                    <li>Skill Development Workshops</li>
                     <li>Scholarship Awareness</li>
-                    <li>Career Guidance</li>
+                    <li>Career Guidance Session</li>
                 </ul>
             </div>
-
         </div>
     `;
 }
 
 function init() {
     console.log("DEBUG: Initializing app...");
+    loadRiskStats();
     loadAnalyticsPreview();
     loadGeneralInterventions();
     
-    // Improved button listener logic
     const buttons = document.querySelectorAll("button");
-    
     buttons.forEach(btn => {
         const text = btn.innerText.trim();
-        
         if (text.includes("UPLOAD DATA") || btn.id === "uploadDataBtn") {
             btn.addEventListener("click", (e) => {
                 e.preventDefault();
                 uploadData();
             });
         }
-        
         if (text.includes("Parent Meeting")) {
              btn.addEventListener("click", (e) => {
                 e.preventDefault();
                 generateMessage();
             });
         }
-
         if (text.includes("Scholarship Portal") || text.includes("Scheme")) {
              btn.addEventListener("click", (e) => {
                 e.preventDefault();
