@@ -26,10 +26,10 @@ if os.environ.get("VERCEL"):
     PERSISTENT_DB = os.path.join(os.path.dirname(__file__), "sql_app.db")
     TEMP_DB = "/tmp/sql_app.db"
     
-    if os.path.exists(PERSISTENT_DB) and not os.path.exists(TEMP_DB):
+    if os.path.exists(PERSISTENT_DB):
         try:
             shutil.copy2(PERSISTENT_DB, TEMP_DB)
-            print("Successfully copied persistent DB to /tmp")
+            print("Successfully refreshed persistent DB in /tmp")
         except Exception as e:
             print(f"Error copying DB to /tmp: {e}")
 else:
